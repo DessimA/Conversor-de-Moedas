@@ -283,7 +283,7 @@ Para adicionar o vídeo demonstrativo, faça o upload para uma plataforma (ex: Y
 **José Anderson da Silva Costa**
 
 <a href="https://www.linkedin.com/in/dessim"><img src="https://cdn.worldvectorlogo.com/logos/linkedin-icon.svg" alt="LinkedIn" width="24" height="24"></a>
-<a href="https://github.com/dessima"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" width="24" height="24"></a>
+<a href="https://github.com/dessima"><img src="https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/github-512.png" alt="GitHub" width="24" height="24"></a>
 
 ## 📄 Licença
 Este projeto está sob a licença MIT.
