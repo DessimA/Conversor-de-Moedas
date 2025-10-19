@@ -158,8 +158,9 @@ classDiagram
         +limparCacheExpirado()
     }
 
-    interface ApiTaxaCambio {
-        obterTaxaCambio(Moeda, Moeda)
+    class ApiTaxaCambio {
+        <<interface>>
+        obterTaxaCambio()
     }
     
     class ExchangeRateApiImpl {
