@@ -201,38 +201,50 @@ classDiagram
 ## 📦 Estrutura do Projeto
 ```
 conversor-moedas/
+├── .env.example
+├── .gitignore
+├── API_SETUP.md
+├── pom.xml
+├── README.md
+├── TESTES.md
+├── .git/
+├── .idea/
+├── data/
+│   ├── historico.json
+│   └── historico.json.bak
+├── docs/
+│   ├── capturas/
+│   └── fluxogramas/
+├── logs/
 ├── src/
 │   └── main/
 │       └── java/
 │           └── com/
 │               └── conversor/
+│                   ├── Estatisticas.java
+│                   ├── InterfaceConversao.java
 │                   ├── Main.java
 │                   ├── MenuPrincipal.java
 │                   ├── models/
-│                   │   ├── Moeda.java
-│                   │   ├── TaxaCambio.java
 │                   │   ├── ConversaoResultado.java
-│                   │   └── HistoricoConversao.java
+│                   │   ├── HistoricoConversao.java
+│                   │   ├── Moeda.java
+│                   │   └── TaxaCambio.java
 │                   ├── services/
 │                   │   ├── ApiTaxaCambio.java
-│                   │   ├── ExchangeRateApiImpl.java
-│                   │   ├── OpenExchangeRatesApiImpl.java
 │                   │   ├── ApiTaxaCambioService.java
-│                   │   └── ConversorMoedas.java
+│                   │   ├── ConversorMoedas.java
+│                   │   ├── ExchangeRateApiImpl.java
+│                   │   └── OpenExchangeRatesApiImpl.java
 │                   └── utils/
 │                       ├── ApiConfig.java
 │                       ├── JsonParser.java
 │                       └── LoggerUtil.java
-├── data/
-│   └── historico.json
-├── logs/
-│   └── conversoes.log
-├── docs/
-│   ├── capturas/
-│   └── fluxogramas/
-├── .gitignore
-├── README.md
-└── API_SETUP.md
+└── target/
+    ├── classes/
+    ├── generated-sources/
+    ├── maven-archiver/
+    └── maven-status/
 ```
 
 ## 🚀 Como Executar
