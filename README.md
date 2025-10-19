@@ -4,16 +4,16 @@
 O Conversor de Moedas é uma aplicação Java console que permite converter valores entre 15 moedas diferentes usando taxas de câmbio em tempo real. A aplicação oferece histórico de conversões, logs detalhados e estatísticas de uso.
 
 ## ⚙️ Funcionalidades
-✅ Conversão entre 15 moedas diferentes (ARS, BOB, BRL, CLP, COP, USD, EUR, GBP, JPY, AUD, CAD, CHF, CNY, MXN, INR)
-✅ Taxas de câmbio atualizadas em tempo real
-✅ Cache de taxas para otimizar performance
-✅ Histórico completo de conversões
-✅ Persistência de dados em arquivo JSON
-✅ Sistema de logs detalhado
-✅ Estatísticas de uso
-✅ Interface interativa via console
-✅ Suporte para múltiplas APIs de câmbio
-✅ Fallback automático entre APIs
+- ✅ Conversão entre 15 moedas diferentes (ARS, BOB, BRL, CLP, COP, USD, EUR, GBP, JPY, AUD, CAD, CHF, CNY, MXN, INR)
+- ✅ Taxas de câmbio atualizadas em tempo real
+- ✅ Cache de taxas para otimizar performance
+- ✅ Histórico completo de conversões
+- ✅ Persistência de dados em arquivo JSON
+- ✅ Sistema de logs detalhado
+- ✅ Estatísticas de uso
+- ✅ Interface interativa via console
+- ✅ Suporte para múltiplas APIs de câmbio
+- ✅ Fallback automático entre APIs
 
 ## 🛠️ Tecnologias Utilizadas
 - **Java JDK 17**: Linguagem de programação
@@ -159,7 +159,7 @@ classDiagram
     }
 
     interface ApiTaxaCambio {
-        +obterTaxaCambio(Moeda, Moeda)
+        obterTaxaCambio(Moeda, Moeda)
     }
     
     class ExchangeRateApiImpl {
@@ -267,8 +267,10 @@ Para adicionar o vídeo demonstrativo, faça o upload para uma plataforma (ex: Y
 [Link do vídeo ou GIF animado mostrando uso da aplicação - A ser adicionado pelo usuário]
 
 ## 👨‍💻 Autor
-[Seu Nome]
-[LinkedIn/GitHub]
+**José Anderson da Silva Costa**
+
+<a href="https://www.linkedin.com/in/dessim"><img src="https://cdn.worldvectorlogo.com/logos/linkedin-icon.svg" alt="LinkedIn" width="24" height="24"></a>
+<a href="https://github.com/dessima"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" width="24" height="24"></a>
 
 ## 📄 Licença
 Este projeto está sob a licença MIT.
