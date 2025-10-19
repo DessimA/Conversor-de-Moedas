@@ -8,13 +8,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Estatisticas {
     private final HistoricoConversao historicoConversao;
+    private final Scanner scanner;
 
-    public Estatisticas(HistoricoConversao historicoConversao) {
+    public Estatisticas(HistoricoConversao historicoConversao, Scanner scanner) {
         this.historicoConversao = historicoConversao;
+        this.scanner = scanner;
     }
 
     public void exibirEstatisticas() {
@@ -27,6 +30,8 @@ public class Estatisticas {
         if (todasConversoes.isEmpty()) {
             System.out.println("Nenhuma conversão realizada ainda para gerar estatísticas.");
             System.out.println("========================================");
+            System.out.print("Pressione ENTER para voltar ao menu...");
+            scanner.nextLine(); // Wait for user input
             return;
         }
 
@@ -51,6 +56,8 @@ public class Estatisticas {
         System.out.println("Frequência de Uso das Moedas (Gráfico ASCII):");
         gerarGraficoFrequenciaMoedas(todasConversoes);
         System.out.println("========================================");
+        System.out.print("Pressione ENTER para voltar ao menu...");
+        scanner.nextLine(); // Wait for user input
     }
 
     private int getTotalConversoes(List<ConversaoResultado> conversoes) {

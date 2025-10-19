@@ -242,14 +242,10 @@ conversor-moedas/
 - Chave da API ExchangeRate (gratuita)
 
 ### Configuração
-1. Clone o repositório
-2. Obtenha sua chave da API em https://www.exchangerate-api.com/
-3. Crie arquivo `config.properties` na raiz do projeto:
-```
-api.key=SUA_CHAVE_AQUI
-```
-4. Configure a biblioteca Gson no IntelliJ
-
+1. Clone o repositório.
+2. Obtenha sua chave da API em https://www.exchangerate-api.com/.
+3. **Defina as variáveis de ambiente** para as chaves das APIs. Consulte o arquivo `API_SETUP.md` para instruções detalhadas sobre como configurar `EXCHANGERATE_API_KEY` e `OPENEXCHANGERATES_APP_ID`.
+4. Configure a biblioteca Gson no IntelliJ (se estiver usando IDE).
 ### Execução
 ```bash
 javac -cp .:gson-2.10.1.jar src/main/java/com/conversor/*.java

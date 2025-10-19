@@ -4,6 +4,7 @@ import com.conversor.models.Moeda;
 import com.conversor.models.TaxaCambio;
 import com.conversor.utils.ApiConfig;
 import com.conversor.services.ApiTaxaCambio;
+import com.conversor.utils.JsonParser;
 import com.conversor.utils.LoggerUtil;
 
 import java.io.IOException;

@@ -31,7 +31,7 @@ public class MenuPrincipal {
         this.historicoConversao = new HistoricoConversao(); // Will be loaded from file later
         this.conversorMoedas = new ConversorMoedas(apiTaxaCambioService, historicoConversao);
         this.interfaceConversao = new InterfaceConversao();
-        this.estatisticas = new Estatisticas(historicoConversao);
+        this.estatisticas = new Estatisticas(historicoConversao, scanner);
     }
 
     public void exibirMenu() {
@@ -50,7 +50,8 @@ public class MenuPrincipal {
 
     public void executar() {
         int opcao = 0;
-        while (opcao != 5) {
+        while (opcao != 6) { // Change loop termination condition to option 6 (Sair)
+            clearScreen(); // Clear screen before displaying menu
             exibirMenu();
             try {
                 opcao = scanner.nextInt();
@@ -92,26 +93,33 @@ public class MenuPrincipal {
     }
 
     private void realizarConversao() throws IOException, InterruptedException {
+        clearScreen(); // Clear screen before displaying option content
         interfaceConversao.realizarConversao(scanner, conversorMoedas);
     }
 
     private void verHistorico() {
+        clearScreen(); // Clear screen before displaying option content
         interfaceConversao.exibirHistorico(scanner, historicoConversao);
     }
 
     private void limparHistorico() {
+        clearScreen(); // Clear screen before displaying option content
         interfaceConversao.limparHistorico(scanner, historicoConversao);
     }
 
     private void verTaxasDisponiveis() {
+        clearScreen(); // Clear screen before displaying option content
         System.out.println("\n--- Taxas Disponíveis ---");
         System.out.println("Moedas suportadas:");
         for (Moeda moeda : Moeda.values()) {
             System.out.printf("- %s (%s) - %s%n", moeda.getCodigo(), moeda.getNomeCompleto(), moeda.getSimbolo());
         }
+        System.out.print("\nPressione ENTER para voltar ao menu...");
+        scanner.nextLine(); // Wait for user input
     }
 
     private void verEstatisticas() {
+        clearScreen(); // Clear screen before displaying option content
         estatisticas.exibirEstatisticas();
     }
 
@@ -119,5 +127,9 @@ public class MenuPrincipal {
         logger.log(Level.INFO, "Aplicação iniciada.");
         MenuPrincipal menu = new MenuPrincipal();
         menu.executar();
+    }
+
+    private void clearScreen() {
+        for (int i = 0; i < 50; ++i) System.out.println();
     }
 }

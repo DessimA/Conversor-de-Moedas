@@ -41,13 +41,18 @@ Exemplo (USD para BRL):
 
 **NUNCA** adicione sua chave de API diretamente no código-fonte ou a envie para um repositório público (como GitHub).
 
-Para este projeto, a chave será carregada de um arquivo de configuração local não versionado:
+Para este projeto, as chaves das APIs serão carregadas de variáveis de ambiente.
 
-1.  Crie um arquivo chamado `config.properties` na raiz do seu projeto (no mesmo nível do `pom.xml`).
-2.  Adicione a seguinte linha ao arquivo `config.properties`, substituindo `SUA_CHAVE_AQUI` pela sua chave real:
+### Para ExchangeRate-API:
+1.  Defina a variável de ambiente `EXCHANGERATE_API_KEY` com a sua chave da API.
+    -   **Windows (CMD):** `set EXCHANGERATE_API_KEY=SUA_CHAVE_AQUI`
+    -   **Windows (PowerShell):** `$env:EXCHANGERATE_API_KEY="SUA_CHAVE_AQUI"`
+    -   **Linux/macOS:** `export EXCHANGERATE_API_KEY=SUA_CHAVE_AQUI`
 
-    ```properties
-    api.key=SUA_CHAVE_AQUI
-    ```
+### Para OpenExchangeRates (API de fallback):
+1.  Defina a variável de ambiente `OPENEXCHANGERATES_APP_ID` com o seu App ID da OpenExchangeRates.
+    -   **Windows (CMD):** `set OPENEXCHANGERATES_APP_ID=SEU_APP_ID_AQUI`
+    -   **Windows (PowerShell):** `$env:OPENEXCHANGERATES_APP_ID="SEU_APP_ID_AQUI"`
+    -   **Linux/macOS:** `export OPENEXCHANGERATES_APP_ID=SEU_APP_ID_AQUI`
 
-3.  O arquivo `.gitignore` do projeto já está configurado para ignorar `config.properties`, garantindo que sua chave não seja versionada.
+**Importante:** Para que as variáveis de ambiente sejam reconhecidas pela aplicação, elas devem ser definidas no terminal *antes* de iniciar a aplicação Java. Para persistência, adicione-as ao seu perfil de usuário ou script de inicialização do sistema.

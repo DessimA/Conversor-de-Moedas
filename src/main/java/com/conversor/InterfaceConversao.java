@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class InterfaceConversao {
             } catch (InputMismatchException e) {
                 System.out.println("Erro de entrada: Por favor, digite um valor válido.");
                 logger.log(Level.WARNING, "Erro de InputMismatchException durante conversão: {0}", e.getMessage());
-            } catch (IllegalArgumentException | RuntimeException e) {
+            } catch (RuntimeException e) { // IllegalArgumentException is a subclass of RuntimeException
                 System.out.println("Erro: " + e.getMessage());
                 logger.log(Level.WARNING, "Erro durante conversão: {0}", e.getMessage());
             } catch (IOException | InterruptedException e) {
@@ -110,6 +111,8 @@ public class InterfaceConversao {
         System.out.println("\n--- Histórico de Conversões ---");
         if (historicoConversao.estaVazio()) {
             System.out.println("O histórico de conversões está vazio.");
+            System.out.print("\nPressione ENTER para voltar ao menu...");
+            scanner.nextLine(); // Wait for user input
             return;
         }
 

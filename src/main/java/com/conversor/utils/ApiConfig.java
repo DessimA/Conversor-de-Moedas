@@ -1,8 +1,6 @@
 package com.conversor.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+
 
 public class ApiConfig {
     private static ApiConfig instance;
@@ -39,26 +37,15 @@ public class ApiConfig {
     }
 
     private void loadApiKey() {
-        Properties prop = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                System.err.println("Sorry, unable to find config.properties. Please create it in the project root.");
-                // Fallback to environment variable if config.properties is not found
-                apiKey = System.getenv("EXCHANGERATE_API_KEY");
-                if (apiKey == null) {
-                    throw new RuntimeException("API Key not found in config.properties or as environment variable EXCHANGERATE_API_KEY.");
-                }
-                openExchangeRatesAppId = System.getenv("OPENEXCHANGERATES_APP_ID"); // Fallback for OpenExchangeRates
-            } else {
-                prop.load(input);
-                apiKey = prop.getProperty("api.key");
-                if (apiKey == null || apiKey.trim().isEmpty()) {
-                    throw new RuntimeException("API Key not found in config.properties. Please ensure 'api.key' is set.");
-                }
-                openExchangeRatesAppId = prop.getProperty("openexchangerates.app_id");
-            }
-        } catch (IOException ex) {
-            throw new RuntimeException("Error loading API key from config.properties", ex);
+        apiKey = System.getenv("EXCHANGERATE_API_KEY");
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new RuntimeException("API Key for ExchangeRate-API not found. Please set the environment variable EXCHANGERATE_API_KEY.");
+        }
+
+        openExchangeRatesAppId = System.getenv("OPENEXCHANGERATES_APP_ID");
+        if (openExchangeRatesAppId == null || openExchangeRatesAppId.trim().isEmpty()) {
+            System.err.println("Warning: App ID for OpenExchangeRates not found. Please set the environment variable OPENEXCHANGERATES_APP_ID if you intend to use it as a fallback.");
+            // Not throwing an exception here, as OpenExchangeRates might be a fallback and not strictly required if primary works.
         }
     }
 
