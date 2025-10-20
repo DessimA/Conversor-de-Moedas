@@ -81,55 +81,74 @@ A aplicação inicia com o `MenuPrincipal`, que orquestra as interações do usu
 
 ```mermaid
 graph TD
-    A[Início da Aplicação] --> B{MenuPrincipal.main()}
-    B --> C[Inicializa Dependências (Historico, ApiConfig, ApiTaxaCambioService, ConversorMoedas, InterfaceConversao, Estatisticas)]
-    C --> D[Cria Instância de MenuPrincipal com DI]
-    D --> E[MenuPrincipal.executar()]
+    A[Início da Aplicação] --> B[MenuPrincipal.main]
+    B --> C[Inicializa Dependências]
+    C --> C1[Historico ApiConfig ApiTaxaCambioService]
+    C1 --> C2[ConversorMoedas InterfaceConversao Estatisticas]
+    C2 --> D[Cria Instância MenuPrincipal com DI]
+    D --> E[MenuPrincipal.executar]
     E --> F{Loop Principal do Menu}
-    F --> G[ConsoleUtils.clearScreen()]
-    F --> H[MenuPrincipal.exibirMenu()]
+    F --> G[ConsoleUtils.clearScreen]
+    G --> H[MenuPrincipal.exibirMenu]
     H --> I[Usuário seleciona opção]
-    I --> J{Switch/Case para Opções}
+    I --> J{Opção Selecionada}
 
-    J --> |1: Converter Moeda| K[InterfaceConversao.realizarConversao()]
-    J --> |2: Ver Histórico| L[InterfaceConversao.exibirHistorico()]
-    J --> |3: Limpar Histórico| M[InterfaceConversao.limparHistorico()]
-    J --> |4: Ver Taxas| N[MenuPrincipal.verTaxasDisponiveis()]
-    J --> |5: Ver Estatísticas| O[Estatisticas.exibirEstatisticas()]
-    J --> |6: Selecionar API| P[MenuPrincipal.selecionarApi()]
-    J --> |7: Cripto para Moeda| Q[InterfaceConversao.realizarConversaoCripto()]
-    J --> |8: Cripto para Criptomoeda| R[InterfaceConversao.realizarConversaoCriptoParaCripto()]
-    J --> |9: Sair| S[Salva estado e encerra]
+    J -->|1: Converter Moeda| K[InterfaceConversao.realizarConversao]
+    J -->|2: Ver Histórico| L[InterfaceConversao.exibirHistorico]
+    J -->|3: Limpar Histórico| M[InterfaceConversao.limparHistorico]
+    J -->|4: Ver Taxas| N[MenuPrincipal.verTaxasDisponiveis]
+    J -->|5: Ver Estatísticas| O[Estatisticas.exibirEstatisticas]
+    J -->|6: Selecionar API| P[MenuPrincipal.selecionarApi]
+    J -->|7: Cripto para Moeda| Q[InterfaceConversao.realizarConversaoCripto]
+    J -->|8: Cripto para Criptomoeda| R[InterfaceConversao.realizarConversaoCriptoParaCripto]
+    J -->|9: Sair| S[Salva estado e encerra]
 
-    K --> K1[InterfaceConversao.realizarConversaoGenerica()]
+    K --> K1[InterfaceConversao.realizarConversaoGenerica]
     K1 --> K2[Exibe menus de seleção de moeda/cripto]
-    K2 --> K3[InterfaceConversao.selecionarMoeda/Cripto()]
-    K3 --> K4[InterfaceConversao.solicitarValor()]
-    K4 --> K5[ConversorMoedas.converter()]
-    K5 --> K6[ApiTaxaCambioService.obterTaxaCambio()]
+    K2 --> K3[InterfaceConversao selecionarMoeda ou Cripto]
+    K3 --> K4[InterfaceConversao.solicitarValor]
+    K4 --> K5[ConversorMoedas.converter]
+    K5 --> K6[ApiTaxaCambioService.obterTaxaCambio]
     K6 --> K7{Tenta API Primária}
-    K7 --> |Sucesso| K8[Retorna Taxa]
-    K7 --> |Falha| K9{Tenta API Fallback}
-    K9 --> |Sucesso| K8
-    K9 --> |Falha| K10[Lança Exceção]
+    K7 -->|Sucesso| K8[Retorna Taxa]
+    K7 -->|Falha| K9{Tenta API Fallback}
+    K9 -->|Sucesso| K8
+    K9 -->|Falha| K10[Lança Exceção]
     K8 --> K11[Calcula Resultado]
-    K11 --> K12[HistoricoConversao.adicionarConversao()]
-    K12 --> K13[LoggerUtil.log()]
+    K11 --> K12[HistoricoConversao.adicionarConversao]
+    K12 --> K13[LoggerUtil.log]
     K13 --> K14[Exibe Resultado]
-    K14 --> K15[Pergunta se deseja continuar]
-    K15 --> F
+    K14 --> K15{Deseja continuar?}
+    K15 -->|Sim| K1
+    K15 -->|Não| F
 
-    L --> L1[HistoricoConversao.getConversoes()]
+    L --> L1[HistoricoConversao.getConversoes]
     L1 --> L2[Exibe histórico formatado]
-    L2 --> L3[Oferece exportar para TXT]
-    L3 --> F
+    L2 --> L3{Exportar para TXT?}
+    L3 -->|Sim| L4[Exporta arquivo]
+    L3 -->|Não| F
+    L4 --> F
+
+    M --> M1{Confirma limpeza?}
+    M1 -->|Sim| M2[HistoricoConversao.limparHistorico]
+    M1 -->|Não| F
+    M2 --> F
+
+    N --> N1[Exibe taxas disponíveis]
+    N1 --> F
 
     O --> O1[Calcula e exibe estatísticas]
     O1 --> F
 
     P --> P1[Atualiza API preferencial]
-P1 --> P2[MenuPrincipal.inicializarServicos() para recarregar APIs]
-P2 --> F
+    P1 --> P2[MenuPrincipal.inicializarServicos]
+    P2 --> F
+
+    Q --> Q1[Fluxo similar a K]
+    Q1 --> F
+
+    R --> R1[Fluxo similar a K]
+    R1 --> F
 
     S --> Z[Fim da Aplicação]
 ```
