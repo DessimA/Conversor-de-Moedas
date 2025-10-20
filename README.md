@@ -1,7 +1,7 @@
 # Conversor de Moedas
 
 ## 📋 Descrição
-O Conversor de Moedas é uma aplicação Java console que permite converter valores entre 15 moedas diferentes usando taxas de câmbio em tempo real. A aplicação oferece histórico de conversões, logs detalhados e estatísticas de uso.
+O Conversor de Moedas é uma aplicação Java console que permite converter valores entre 15 moedas diferentes usando taxas de câmbio em tempo real. A aplicação oferece histórico de conversões, logs detalhados e estatísticas de uso. O usuário pode selecionar a API de câmbio preferencial (ExchangeRate-API ou OpenExchangeRates) no início da execução.
 
 ## ⚙️ Funcionalidades
 - ✅ Conversão entre 15 moedas diferentes (ARS, BOB, BRL, CLP, COP, USD, EUR, GBP, JPY, AUD, CAD, CHF, CNY, MXN, INR)
@@ -12,8 +12,9 @@ O Conversor de Moedas é uma aplicação Java console que permite converter valo
 - ✅ Sistema de logs detalhado
 - ✅ Estatísticas de uso
 - ✅ Interface interativa via console
-- ✅ Suporte para múltiplas APIs de câmbio
+- ✅ Suporte para múltiplas APIs de câmbio (ExchangeRate-API e OpenExchangeRates)
 - ✅ Fallback automático entre APIs
+- ✅ **Seleção de API preferencial pelo usuário**
 
 ## 🛠️ Tecnologias Utilizadas
 - **Java JDK 17**: Linguagem de programação
@@ -35,35 +36,42 @@ flowchart TD
     C -->|2| E[Ver Histórico]
     C -->|3| F[Limpar Histórico]
     C -->|4| G[Ver Estatísticas]
-    C -->|5| H[Sair]
+    C -->|5| H[Ver Taxas Disponíveis]
+    C -->|6| I[Selecionar API de Câmbio]
+    C -->|7| J[Sair]
     
-    D --> I[Selecionar Moeda Origem]
-    I --> J[Selecionar Moeda Destino]
-    J --> K[Informar Valor]
-    K --> L[Consultar API]
-    L --> M{Sucesso?}
-    M -->|Sim| N[Calcular Conversão]
-    M -->|Não| O[Tentar API Fallback]
-    O --> M
-    N --> P[Exibir Resultado]
-    P --> Q[Salvar no Histórico]
-    Q --> R[Registrar Log]
-    R --> B
-    
-    E --> S[Carregar Histórico]
-    S --> T[Exibir Últimas 10]
+    D --> K[Selecionar Moeda Origem]
+    K --> L[Selecionar Moeda Destino]
+    L --> M[Informar Valor]
+    M --> N[Consultar API]
+    N --> O{Sucesso?}
+    O -->|Sim| P[Calcular Conversão]
+    O -->|Não| Q[Tentar API Fallback]
+    Q --> N
+    P --> R[Exibir Resultado]
+    R --> S[Salvar no Histórico]
+    S --> T[Registrar Log]
     T --> B
     
-    F --> U[Confirmar Ação]
-    U --> V[Limpar Dados]
+    E --> U[Carregar Histórico]
+    U --> V[Exibir Últimas 10]
     V --> B
     
-    G --> W[Calcular Estatísticas]
-    W --> X[Exibir Dados]
+    F --> W[Confirmar Ação]
+    W --> X[Limpar Dados]
     X --> B
     
-    H --> Y[Salvar Estado]
-    Y --> Z[Fim]
+    G --> Y[Calcular Estatísticas]
+    Y --> Z[Exibir Dados]
+    Z --> B
+
+    I --> AA[Apresentar Opções de API]
+    AA --> BB[Usuário Seleciona API]
+    BB --> CC[Re-inicializar Serviços com Nova API]
+    CC --> B
+    
+    J --> DD[Salvar Estado]
+    DD --> EE[Fim]
 ```
 
 ### FLUXO DE CONVERSÃO DETALHADO
@@ -113,8 +121,11 @@ classDiagram
         -Scanner scanner
         -ConversorMoedas conversor
         -HistoricoConversao historico
+        -String preferredApi
         +exibirMenu()
         +executar()
+        +selecionarApi()
+        -inicializarServicos()
     }
     
     class Moeda {
@@ -153,6 +164,8 @@ classDiagram
         -ApiTaxaCambio primaryApi
         -ApiTaxaCambio fallbackApi
         -Map~String,TaxaCambio~ cache
+        -String preferredApiName
+        +ApiTaxaCambioService(ApiConfig, String)
         +obterTaxaCambio(Moeda, Moeda)
         -isCacheValid(TaxaCambio)
         +limparCacheExpirado()
@@ -252,13 +265,20 @@ conversor-moedas/
 ### Pré-requisitos
 - Java JDK 17 ou superior instalado
 - Conexão com internet
-- Chave da API ExchangeRate (gratuita)
+- Chaves das APIs ExchangeRate e OpenExchangeRates (ambas gratuitas, mas a OpenExchangeRates requer registro para um App ID)
 
 ### Configuração
 1. Clone o repositório.
-2. Obtenha sua chave da API em https://www.exchangerate-api.com/.
-3. **Defina as variáveis de ambiente** para as chaves das APIs. Consulte o arquivo `API_SETUP.md` para instruções detalhadas sobre como configurar `EXCHANGERATE_API_KEY` e `OPENEXCHANGERATES_APP_ID`.
-4. Configure a biblioteca Gson no IntelliJ (se estiver usando IDE).
+2. Obtenha sua chave da API ExchangeRate em https://www.exchangerate-api.com/.
+3. Obtenha seu App ID da OpenExchangeRates em https://openexchangerates.org/ (registro gratuito).
+4. **Defina as variáveis de ambiente** para as chaves das APIs. Crie um arquivo `.env` na raiz do projeto (não versionado) ou defina-as diretamente no seu sistema operacional:
+   ```
+   EXCHANGERATE_API_KEY=SUA_CHAVE_EXCHANGERATE_AQUI
+   OPENEXCHANGERATES_APP_ID=SEU_APP_ID_OPENEXCHANGERATES_AQUI
+   ```
+   Consulte o arquivo `API_SETUP.md` para instruções detalhadas sobre como configurar essas variáveis.
+5. Configure a biblioteca Gson no IntelliJ (se estiver usando IDE).
+
 ### Execução
 ```bash
 javac -cp .:gson-2.10.1.jar src/main/java/com/conversor/*.java

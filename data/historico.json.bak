@@ -1,50 +1,10 @@
 [
   {
     "valorOriginal": 10.0,
-    "moedaOrigem": "ARS",
-    "valorConvertido": 0.04,
-    "moedaDestino": "BRL",
-    "taxaUtilizada": 0.003782,
-    "dataHora": "2025-10-19T15:12:42.3252369"
-  },
-  {
-    "valorOriginal": 10.0,
-    "moedaOrigem": "INR",
-    "valorConvertido": 0.62,
-    "moedaDestino": "BRL",
-    "taxaUtilizada": 0.06185,
-    "dataHora": "2025-10-19T15:13:11.0441922"
-  },
-  {
-    "valorOriginal": 1.0,
     "moedaOrigem": "BRL",
-    "valorConvertido": 0.28,
-    "moedaDestino": "AUD",
-    "taxaUtilizada": 0.2839,
-    "dataHora": "2025-10-19T15:23:15.9313162"
-  },
-  {
-    "valorOriginal": 10.0,
-    "moedaOrigem": "BRL",
-    "valorConvertido": 1.84,
-    "moedaDestino": "USD",
-    "taxaUtilizada": 0.1837,
-    "dataHora": "2025-10-19T15:24:48.7796342"
-  },
-  {
-    "valorOriginal": 35.0,
-    "moedaOrigem": "BRL",
-    "valorConvertido": 6.43,
-    "moedaDestino": "USD",
-    "taxaUtilizada": 0.1837,
-    "dataHora": "2025-10-19T15:27:54.6900393"
-  },
-  {
-    "valorOriginal": 10.0,
-    "moedaOrigem": "USD",
-    "valorConvertido": 54.44,
-    "moedaDestino": "BRL",
-    "taxaUtilizada": 5.4444,
-    "dataHora": "2025-10-19T15:36:00.6258895"
+    "valorConvertido": 1.58,
+    "moedaDestino": "EUR",
+    "taxaUtilizada": 0.1575,
+    "dataHora": "2025-10-19T22:44:13.7998431"
   }
 ]

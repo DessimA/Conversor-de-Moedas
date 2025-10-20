@@ -118,3 +118,18 @@ Este documento detalha os cenários de teste manual para o Conversor de Moedas e
   3. Escolher 's' para exportar o histórico.
 - **Resultado Esperado:** Um arquivo TXT deve ser criado na pasta `logs` com o histórico formatado.
 - **Resultado Obtido:** [A preencher]
+
+### 13. Teste de Seleção de API
+- **Descrição:** Verificar se o usuário pode selecionar a API preferencial e se a aplicação utiliza a API escolhida.
+- **Passos:**
+  1. Iniciar a aplicação.
+  2. Selecionar a opção 'Selecionar API de Câmbio'.
+  3. Escolher '2' (OpenExchangeRates).
+  4. Realizar uma conversão (ex: USD para BRL).
+  5. Sair da aplicação.
+  6. Iniciar a aplicação novamente.
+  7. Selecionar a opção 'Selecionar API de Câmbio'.
+  8. Escolher '1' (ExchangeRate-API).
+  9. Realizar uma conversão (ex: USD para BRL).
+- **Resultado Esperado:** O log deve indicar que a API selecionada foi utilizada para a conversão. Ao reiniciar a aplicação, a API padrão deve ser 'EXCHANGERATE_API' (ou a definida via `api.preferred` no `System.getProperty`), e a seleção manual deve sobrescrever essa preferência para as conversões subsequentes.
+- **Resultado Obtido:** [A preencher]

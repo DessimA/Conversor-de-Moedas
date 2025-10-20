@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "valorOriginal": 10.0,
+    "moedaOrigem": "BRL",
+    "valorConvertido": 1.58,
+    "moedaDestino": "EUR",
+    "taxaUtilizada": 0.1575,
+    "dataHora": "2025-10-19T22:44:13.7998431"
+  },
+  {
+    "valorOriginal": 10.0,
+    "moedaOrigem": "BRL",
+    "valorConvertido": 2.84,
+    "moedaDestino": "AUD",
+    "taxaUtilizada": 0.2843,
+    "dataHora": "2025-10-19T22:44:54.0682354"
+  }
+]
