@@ -32,6 +32,18 @@ public class CoinGeckoApiImpl implements ApiTaxaCambio {
         this.apiKey = apiKey;
     }
 
+    private double parseCoinGeckoResponse(String jsonResponse, Moeda origem, Moeda destino) throws JsonSyntaxException, IllegalArgumentException {
+        JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
+        if (jsonObject == null || !jsonObject.has(origem.getNomeCompleto().toLowerCase())) {
+            throw new JsonSyntaxException("Resposta JSON inválida: ID da criptomoeda não encontrado.");
+        }
+        JsonObject cryptoObject = jsonObject.getAsJsonObject(origem.getNomeCompleto().toLowerCase());
+        if (!cryptoObject.has(destino.getCodigo().toLowerCase())) {
+            throw new IllegalArgumentException("Moeda de destino não encontrada nas taxas da API CoinGecko.");
+        }
+        return cryptoObject.get(destino.getCodigo().toLowerCase()).getAsDouble();
+    }
+
     @Override
     public TaxaCambio obterTaxaCambio(Moeda origem, Moeda destino) throws IOException, InterruptedException, RuntimeException {
         String url = String.format("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=%s&x_cg_demo_api_key=%s",
@@ -52,15 +64,7 @@ public class CoinGeckoApiImpl implements ApiTaxaCambio {
         if (statusCode == 200) {
             logger.log(Level.INFO, "Requisição CoinGecko bem-sucedida. Resposta: {0}", responseBody);
             try {
-                JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
-                if (jsonObject == null || !jsonObject.has(origem.getNomeCompleto().toLowerCase())) {
-                    throw new JsonSyntaxException("Resposta JSON inválida: ID da criptomoeda não encontrado.");
-                }
-                JsonObject cryptoObject = jsonObject.getAsJsonObject(origem.getNomeCompleto().toLowerCase());
-                if (!cryptoObject.has(destino.getCodigo().toLowerCase())) {
-                    throw new IllegalArgumentException("Moeda de destino não encontrada nas taxas da API CoinGecko.");
-                }
-                double conversionRate = cryptoObject.get(destino.getCodigo().toLowerCase()).getAsDouble();
+                double conversionRate = parseCoinGeckoResponse(responseBody, origem, destino);
                 return new TaxaCambio(origem, destino, conversionRate, LocalDateTime.now());
             } catch (JsonSyntaxException e) {
                 logger.log(Level.SEVERE, "Erro de parsing JSON da CoinGecko: {0}", e.getMessage());

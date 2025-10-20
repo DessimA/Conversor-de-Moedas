@@ -6,6 +6,7 @@ import com.conversor.utils.ApiConfig;
 import com.conversor.services.ApiTaxaCambio;
 import com.conversor.utils.JsonParser;
 import com.conversor.utils.LoggerUtil;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,7 +30,7 @@ public class ExchangeRateApiImpl implements ApiTaxaCambio {
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         this.apiConfig = apiConfig; // Use injected ApiConfig
-        this.jsonParser = new JsonParser();
+        this.jsonParser = new JsonParser(new Gson());
     }
 
     public TaxaCambio obterTaxaCambio(Moeda origem, Moeda destino) throws IOException, InterruptedException, RuntimeException {

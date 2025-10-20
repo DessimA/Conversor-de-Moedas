@@ -5,6 +5,7 @@ import com.conversor.models.HistoricoConversao;
 import com.conversor.models.Moeda;
 import com.conversor.models.TaxaCambio;
 import com.conversor.utils.LoggerUtil;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -13,15 +14,11 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@RequiredArgsConstructor
 public class ConversorMoedas {
     private static final Logger logger = LoggerUtil.getLogger(ConversorMoedas.class.getName());
     private final ApiTaxaCambio apiTaxaCambio;
     private final HistoricoConversao historicoConversao;
-
-    public ConversorMoedas(ApiTaxaCambio apiTaxaCambio, HistoricoConversao historicoConversao) {
-        this.apiTaxaCambio = apiTaxaCambio;
-        this.historicoConversao = historicoConversao;
-    }
 
     public ConversaoResultado converter(double valor, Moeda origem, Moeda destino) throws IOException, InterruptedException, RuntimeException {
         if (valor <= 0) {

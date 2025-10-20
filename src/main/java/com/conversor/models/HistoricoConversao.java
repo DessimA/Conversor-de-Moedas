@@ -10,6 +10,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Getter
 public class HistoricoConversao {
     private static final Logger logger = LoggerUtil.getLogger(HistoricoConversao.class.getName());
     private static final String HISTORICO_FILE = "data/historico.json";
@@ -61,10 +63,6 @@ public class HistoricoConversao {
     public void adicionarConversao(ConversaoResultado resultado) {
         this.conversoes.add(resultado);
         salvarEmArquivo();
-    }
-
-    public List<ConversaoResultado> getTodasConversoes() {
-        return Collections.unmodifiableList(conversoes);
     }
 
     public List<ConversaoResultado> getUltimasConversoes(int n) {

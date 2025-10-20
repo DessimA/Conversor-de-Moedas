@@ -1,18 +1,26 @@
 [
   {
     "valorOriginal": 1.0,
-    "moedaOrigem": "CAD",
-    "valorConvertido": 3.87,
-    "moedaDestino": "BRL",
-    "taxaUtilizada": 3.8713,
-    "dataHora": "2025-10-20T16:03:47.7720965"
+    "moedaOrigem": "BRL",
+    "valorConvertido": 0.18,
+    "moedaDestino": "USD",
+    "taxaUtilizada": 0.184,
+    "dataHora": "2025-10-20T17:18:51.3042175"
+  },
+  {
+    "valorOriginal": 2.0,
+    "moedaOrigem": "BTC",
+    "valorConvertido": 55.61,
+    "moedaDestino": "ETH",
+    "taxaUtilizada": 27.805304502915774,
+    "dataHora": "2025-10-20T17:24:55.6127023"
   },
   {
     "valorOriginal": 1.0,
     "moedaOrigem": "BTC",
-    "valorConvertido": 110921.0,
-    "moedaDestino": "USD",
-    "taxaUtilizada": 110921.0,
-    "dataHora": "2025-10-20T16:04:35.9415939"
+    "valorConvertido": 603146.13,
+    "moedaDestino": "BRL",
+    "taxaUtilizada": 603146.1337,
+    "dataHora": "2025-10-20T17:25:15.3315819"
   }
 ]

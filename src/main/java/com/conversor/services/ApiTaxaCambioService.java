@@ -1,5 +1,7 @@
 package com.conversor.services;
 
+import com.conversor.services.ApiProvider;
+import com.conversor.services.ApiTaxaCambioFactory;
 import com.conversor.models.Moeda;
 import com.conversor.models.TaxaCambio;
 import com.conversor.utils.ApiConfig;
@@ -18,27 +20,24 @@ public class ApiTaxaCambioService implements ApiTaxaCambio {
     private final ApiTaxaCambio fallbackApi;
     private final ApiTaxaCambio coinGeckoApi;
     private final Map<String, TaxaCambio> cacheTaxas;
-    private final String preferredApiName;
 
-    public ApiTaxaCambioService(ApiConfig apiConfig, String preferredApiName) {
+    public ApiTaxaCambioService(ApiConfig apiConfig, ApiProvider preferredApiProvider) {
         this.cacheTaxas = new ConcurrentHashMap<>();
-        this.preferredApiName = preferredApiName;
 
         // Initialize API implementations
-        ApiTaxaCambio exchangeRateApi = new ExchangeRateApiImpl(apiConfig);
-        ApiTaxaCambio openExchangeRatesApi = new OpenExchangeRatesApiImpl(apiConfig.getOpenExchangeRatesAppId());
         this.coinGeckoApi = new CoinGeckoApiImpl(apiConfig.getCoinGeckoApiKey());
 
-        if ("EXCHANGERATE_API".equalsIgnoreCase(preferredApiName)) {
-            this.primaryApi = exchangeRateApi;
-            this.fallbackApi = openExchangeRatesApi;
-        } else if ("OPENEXCHANGERATES".equalsIgnoreCase(preferredApiName)) {
-            this.primaryApi = openExchangeRatesApi;
-            this.fallbackApi = exchangeRateApi;
+        // Use factory to get primary and fallback APIs
+        if (preferredApiProvider == ApiProvider.EXCHANGERATE_API) {
+            this.primaryApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.EXCHANGERATE_API, apiConfig);
+            this.fallbackApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.OPENEXCHANGERATES, apiConfig);
+        } else if (preferredApiProvider == ApiProvider.OPENEXCHANGERATES) {
+            this.primaryApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.OPENEXCHANGERATES, apiConfig);
+            this.fallbackApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.EXCHANGERATE_API, apiConfig);
         } else {
-            logger.log(Level.WARNING, "API preferencial '{0}' não reconhecida. Usando ExchangeRate-API como primária e OpenExchangeRates como fallback.", preferredApiName);
-            this.primaryApi = exchangeRateApi;
-            this.fallbackApi = openExchangeRatesApi;
+            logger.log(Level.WARNING, "API preferencial '{0}' não reconhecida. Usando ExchangeRate-API como primária e OpenExchangeRates como fallback.", preferredApiProvider.getName());
+            this.primaryApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.EXCHANGERATE_API, apiConfig);
+            this.fallbackApi = ApiTaxaCambioFactory.getApiImplementation(ApiProvider.OPENEXCHANGERATES, apiConfig);
         }
         logger.log(Level.INFO, "API Primária: {0}, API Fallback: {1}", new Object[]{primaryApi.getClass().getSimpleName(), fallbackApi.getClass().getSimpleName()});
     }

@@ -3,14 +3,12 @@ package com.conversor.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class JsonParser {
 
     private final Gson gson;
-
-    public JsonParser() {
-        this.gson = new Gson();
-    }
 
     public double parseConversionRate(String jsonResponse, String expectedBaseCode, String expectedTargetCode) throws JsonSyntaxException, IllegalArgumentException {
         JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);

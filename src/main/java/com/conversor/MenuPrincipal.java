@@ -1,5 +1,7 @@
 package com.conversor;
 
+import com.conversor.services.ApiProvider;
+import com.conversor.utils.ConsoleUtils;
 import com.conversor.models.Moeda;
 import com.conversor.services.ConversorMoedas;
 import com.conversor.models.HistoricoConversao;
@@ -20,13 +22,15 @@ public class MenuPrincipal {
     private final HistoricoConversao historicoConversao;
     private InterfaceConversao interfaceConversao; // Changed to non-final
     private final Estatisticas estatisticas;
-    private String preferredApi; // New field for preferred API
+    private ApiProvider preferredApi; // New field for preferred API
 
-    public MenuPrincipal() {
+    public MenuPrincipal(ConversorMoedas conversorMoedas, HistoricoConversao historicoConversao, InterfaceConversao interfaceConversao, Estatisticas estatisticas) {
         this.scanner = new Scanner(System.in);
-        this.historicoConversao = new HistoricoConversao(); // Will be loaded from file later
-        this.estatisticas = new Estatisticas(historicoConversao, scanner);
-        this.preferredApi = System.getProperty("api.preferred", "EXCHANGERATE_API"); // Default from system property or hardcoded
+        this.historicoConversao = historicoConversao;
+        this.conversorMoedas = conversorMoedas;
+        this.interfaceConversao = interfaceConversao;
+        this.estatisticas = estatisticas;
+        this.preferredApi = ApiProvider.fromString(System.getProperty("api.preferred", "EXCHANGERATE_API")); // Default from system property or hardcoded
         inicializarServicos(); // Initialize services with default/preferred API
     }
 
@@ -34,7 +38,7 @@ public class MenuPrincipal {
         ApiConfig apiConfig = ApiConfig.getInstance();
         ApiTaxaCambioService apiTaxaCambioService = new ApiTaxaCambioService(apiConfig, preferredApi);
         this.conversorMoedas = new ConversorMoedas(apiTaxaCambioService, historicoConversao);
-        this.interfaceConversao = new InterfaceConversao(); // Re-initialize if needed, or ensure it's stateless
+        // interfaceConversao is now injected, no need to re-initialize here unless its internal state needs updating
     }
 
     public void exibirMenu() {
@@ -46,7 +50,7 @@ public class MenuPrincipal {
         System.out.println("3) Limpar histórico");
         System.out.println("4) Ver taxas disponíveis");
         System.out.println("5) Ver Estatísticas");
-        System.out.println("6) Selecionar API de Câmbio (Atual: " + preferredApi + ")");
+        System.out.println("6) Selecionar API de Câmbio (Atual: " + preferredApi.getName() + ")");
         System.out.println("7) Converter Criptomoeda para Moeda");
         System.out.println("8) Converter Criptomoeda para Criptomoeda");
         System.out.println("9) Sair");
@@ -57,7 +61,7 @@ public class MenuPrincipal {
     public void executar() {
         int opcao = 0;
         while (opcao != 9) { // Change loop termination condition to option 9 (Sair)
-            clearScreen(); // Clear screen before displaying menu
+            ConsoleUtils.clearScreen(); // Clear screen before displaying menu
             exibirMenu();
             try {
                 opcao = scanner.nextInt();
@@ -108,7 +112,7 @@ public class MenuPrincipal {
     }
 
     private void selecionarApi() {
-        clearScreen();
+        ConsoleUtils.clearScreen();
         System.out.println("\n--- Selecionar API de Câmbio ---");
         System.out.println("1) ExchangeRate-API (Padrão)");
         System.out.println("2) OpenExchangeRates");
@@ -119,20 +123,19 @@ public class MenuPrincipal {
 
             switch (apiChoice) {
                 case 1:
-                    preferredApi = "EXCHANGERATE_API";
-                    System.out.println("API selecionada: ExchangeRate-API");
+                    preferredApi = ApiProvider.EXCHANGERATE_API;
+                    System.out.println("API selecionada: " + preferredApi.getName());
                     break;
                 case 2:
-                    preferredApi = "OPENEXCHANGERATES";
-                    System.out.println("API selecionada: OpenExchangeRates");
+                    preferredApi = ApiProvider.OPENEXCHANGERATES;
+                    System.out.println("API selecionada: " + preferredApi.getName());
                     break;
                 default:
                     System.out.println("Opção inválida. Usando ExchangeRate-API como padrão.");
-                    preferredApi = "EXCHANGERATE_API";
+                    preferredApi = ApiProvider.EXCHANGERATE_API;
             }
             inicializarServicos(); // Re-initialize services with new API
-            System.out.print("Pressione ENTER para voltar ao menu...");
-            scanner.nextLine();
+            ConsoleUtils.waitForEnter(scanner);
         } catch (InputMismatchException e) {
             System.out.println("Entrada inválida. Por favor, digite um número.");
             logger.log(Level.WARNING, "Entrada inválida na seleção de API: {0}", scanner.nextLine());
@@ -141,53 +144,60 @@ public class MenuPrincipal {
     }
 
     private void realizarConversao() throws IOException, InterruptedException {
-        clearScreen(); // Clear screen before displaying option content
+        ConsoleUtils.clearScreen(); // Clear screen before displaying option content
         interfaceConversao.realizarConversao(scanner, conversorMoedas);
     }
 
     private void verHistorico() {
-        clearScreen(); // Clear screen before displaying option content
+        ConsoleUtils.clearScreen(); // Clear screen before displaying option content
         interfaceConversao.exibirHistorico(scanner, historicoConversao);
     }
 
     private void limparHistorico() {
-        clearScreen(); // Clear screen before displaying option content
+        ConsoleUtils.clearScreen(); // Clear screen before displaying option content
         interfaceConversao.limparHistorico(scanner, historicoConversao);
     }
 
     private void verTaxasDisponiveis() {
-        clearScreen(); // Clear screen before displaying option content
+        ConsoleUtils.clearScreen(); // Clear screen before displaying option content
         System.out.println("\n--- Taxas Disponíveis ---");
         System.out.println("Moedas suportadas:");
         for (Moeda moeda : Moeda.values()) {
             System.out.printf("- %s (%s) - %s%n", moeda.getCodigo(), moeda.getNomeCompleto(), moeda.getSimbolo());
         }
-        System.out.print("\nPressione ENTER para voltar ao menu...");
-        scanner.nextLine(); // Wait for user input
+        ConsoleUtils.waitForEnter(scanner); // Wait for user input
     }
 
     private void verEstatisticas() {
-        clearScreen(); // Clear screen before displaying option content
+        ConsoleUtils.clearScreen(); // Clear screen before displaying option content
         estatisticas.exibirEstatisticas();
+        ConsoleUtils.waitForEnter(scanner);
     }
 
     private void realizarConversaoCripto() throws IOException, InterruptedException {
-        clearScreen();
+        ConsoleUtils.clearScreen();
         interfaceConversao.realizarConversaoCripto(scanner, conversorMoedas);
     }
 
     private void realizarConversaoCriptoParaCripto() throws IOException, InterruptedException {
-        clearScreen();
+        ConsoleUtils.clearScreen();
         interfaceConversao.realizarConversaoCriptoParaCripto(scanner, conversorMoedas);
     }
 
     public static void main(String[] args) {
         logger.log(Level.INFO, "Aplicação iniciada.");
-        MenuPrincipal menu = new MenuPrincipal();
+
+        // Initialize dependencies
+        HistoricoConversao historicoConversao = new HistoricoConversao();
+        ApiConfig apiConfig = ApiConfig.getInstance();
+        ApiTaxaCambioService apiTaxaCambioService = new ApiTaxaCambioService(apiConfig, ApiProvider.EXCHANGERATE_API); // Default API for initial setup
+        ConversorMoedas conversorMoedas = new ConversorMoedas(apiTaxaCambioService, historicoConversao);
+        InterfaceConversao interfaceConversao = new InterfaceConversao();
+        Estatisticas estatisticas = new Estatisticas(historicoConversao);
+
+        MenuPrincipal menu = new MenuPrincipal(conversorMoedas, historicoConversao, interfaceConversao, estatisticas);
         menu.executar();
     }
 
-    private void clearScreen() {
-        for (int i = 0; i < 50; ++i) System.out.println();
-    }
+
 }

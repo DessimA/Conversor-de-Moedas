@@ -31,6 +31,18 @@ public class OpenExchangeRatesApiImpl implements ApiTaxaCambio {
         this.appId = appId;
     }
 
+    private double parseOpenExchangeRatesResponse(String jsonResponse, Moeda origem, Moeda destino) throws JsonSyntaxException, IllegalArgumentException {
+        JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
+        if (jsonObject == null || !jsonObject.has("rates")) {
+            throw new JsonSyntaxException("Resposta JSON inválida: 'rates' não encontrado.");
+        }
+        JsonObject rates = jsonObject.getAsJsonObject("rates");
+        if (!rates.has(destino.getCodigo())) {
+            throw new IllegalArgumentException("Moeda de destino não encontrada nas taxas da API.");
+        }
+        return rates.get(destino.getCodigo()).getAsDouble();
+    }
+
     @Override
     public TaxaCambio obterTaxaCambio(Moeda origem, Moeda destino) throws IOException, InterruptedException, RuntimeException {
         String url = String.format("https://openexchangerates.org/api/latest.json?app_id=%s&base=%s&symbols=%s",
@@ -51,15 +63,7 @@ public class OpenExchangeRatesApiImpl implements ApiTaxaCambio {
         if (statusCode == 200) {
             logger.log(Level.INFO, "Requisição OpenExchangeRates bem-sucedida. Resposta: {0}", responseBody);
             try {
-                JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
-                if (jsonObject == null || !jsonObject.has("rates")) {
-                    throw new JsonSyntaxException("Resposta JSON inválida: 'rates' não encontrado.");
-                }
-                JsonObject rates = jsonObject.getAsJsonObject("rates");
-                if (!rates.has(destino.getCodigo())) {
-                    throw new IllegalArgumentException("Moeda de destino não encontrada nas taxas da API.");
-                }
-                double conversionRate = rates.get(destino.getCodigo()).getAsDouble();
+                double conversionRate = parseOpenExchangeRatesResponse(responseBody, origem, destino);
                 return new TaxaCambio(origem, destino, conversionRate, LocalDateTime.now());
             } catch (JsonSyntaxException e) {
                 logger.log(Level.SEVERE, "Erro de parsing JSON da OpenExchangeRates: {0}", e.getMessage());

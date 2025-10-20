@@ -1,7 +1,8 @@
 package com.conversor.utils;
 
+import lombok.Getter;
 
-
+@Getter
 public class ApiConfig {
     private static ApiConfig instance;
     private String apiKey;
@@ -9,23 +10,6 @@ public class ApiConfig {
     private String coinGeckoApiKey;
     private final String BASE_URL = "https://v6.exchangerate-api.com/v6/";
     private final String COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3/";
-
-    // Supported currencies as constants
-    public static final String ARS = "ARS";
-    public static final String BOB = "BOB";
-    public static final String BRL = "BRL";
-    public static final String CLP = "CLP";
-    public static final String COP = "COP";
-    public static final String USD = "USD";
-    public static final String EUR = "EUR";
-    public static final String GBP = "GBP";
-    public static final String JPY = "JPY";
-    public static final String AUD = "AUD";
-    public static final String CAD = "CAD";
-    public static final String CHF = "CHF";
-    public static final String CNY = "CNY";
-    public static final String MXN = "MXN";
-    public static final String INR = "INR";
 
     private ApiConfig() {
         loadApiKey();
@@ -54,18 +38,6 @@ public class ApiConfig {
         if (coinGeckoApiKey == null || coinGeckoApiKey.trim().isEmpty()) {
             System.err.println("Warning: API Key for CoinGecko not found. Please set the environment variable COINGECKO_API_KEY if you intend to use it.");
         }
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public String getOpenExchangeRatesAppId() {
-        return openExchangeRatesAppId;
-    }
-
-    public String getCoinGeckoApiKey() {
-        return coinGeckoApiKey;
     }
 
     public String buildPairConversionUrl(String baseCurrency, String targetCurrency) {
