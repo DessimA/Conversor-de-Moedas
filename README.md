@@ -3,7 +3,9 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Java-17-blue.svg" alt="Java 17">
   <img src="https://img.shields.io/badge/Gson-2.10.1-blue.svg" alt="Gson 2.10.1">
-  <img src="https://img.shields.io/badge/API-ExchangeRate%20%26%20CoinGecko-green.svg" alt="APIs">
+  <img src="https://img.shields.io/badge/API-ExchangeRate-red.svg" alt="APIs">
+  <img src="https://img.shields.io/badge/API-OpenExchangeRates-green.svg" alt="APIs">
+  <img src="https://img.shields.io/badge/API-CoinGecko-orange.svg" alt="APIs">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License MIT">
 </p>
 
@@ -342,7 +344,7 @@ conversor-moedas/
 ### Configuração
 1.  **Clone o repositório:**
     ```bash
-    git clone https://github.com/seu-usuario/conversor-moedas.git
+    git clone https://github.com/dessima/conversor-moedas.git
     ```
 2.  **Obtenha as chaves de API:**
     - `ExchangeRate-API`: [exchangerate-api.com](https://www.exchangerate-api.com/)
