@@ -35,11 +35,11 @@ flowchart TD
     C -->|1| D[Converter Moeda]
     C -->|2| E[Ver Histórico]
     C -->|3| F[Limpar Histórico]
-    C -->|4| G[Ver Estatísticas]
-    C -->|5| H[Ver Taxas Disponíveis]
+    C -->|4| G[Ver Taxas Disponíveis]
+    C -->|5| H[Ver Estatísticas]
     C -->|6| I[Selecionar API de Câmbio]
     C -->|7| J[Sair]
-    
+
     D --> K[Selecionar Moeda Origem]
     K --> L[Selecionar Moeda Destino]
     L --> M[Informar Valor]
@@ -52,16 +52,16 @@ flowchart TD
     R --> S[Salvar no Histórico]
     S --> T[Registrar Log]
     T --> B
-    
+
     E --> U[Carregar Histórico]
     U --> V[Exibir Últimas 10]
     V --> B
-    
+
     F --> W[Confirmar Ação]
     W --> X[Limpar Dados]
     X --> B
-    
-    G --> Y[Calcular Estatísticas]
+
+    H --> Y[Calcular Estatísticas]
     Y --> Z[Exibir Dados]
     Z --> B
 
@@ -69,7 +69,7 @@ flowchart TD
     AA --> BB[Usuário Seleciona API]
     BB --> CC[Re-inicializar Serviços com Nova API]
     CC --> B
-    
+
     J --> DD[Salvar Estado]
     DD --> EE[Fim]
 ```
