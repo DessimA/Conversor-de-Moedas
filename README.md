@@ -57,7 +57,7 @@ flowchart TD
     J --> |5: Ver Estatísticas| O[Estatisticas.exibirEstatisticas()]
     J --> |6: Selecionar API| P[MenuPrincipal.selecionarApi()]
     J --> |7: Cripto para Moeda| Q[InterfaceConversao.realizarConversaoCripto()]
-    J --> |8: Cripto para Cripto| R[InterfaceConversao.realizarConversaoCriptoParaCripto()]
+    J --> |8: Cripto para Criptomoeda| R[InterfaceConversao.realizarConversaoCriptoParaCripto()]
     J --> |9: Sair| S[Salva estado e encerra]
 
     K --> K1[InterfaceConversao.realizarConversaoGenerica()]
