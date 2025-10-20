@@ -38,7 +38,16 @@ Após o registro e confirmação do e-mail:
 2.  Seu App ID será exibido no painel de controle.
 3.  **Copie este App ID; ele será necessário para configurar o projeto.**
 
-## 5. Limites das APIs (Planos Gratuitos)
+## 5. Registro na CoinGecko (API de Criptomoedas)
+
+Para obter as cotações de criptomoedas, você precisará de uma chave de API da CoinGecko.
+
+1.  Acesse o site oficial: [https://www.coingecko.com/en/api](https://www.coingecko.com/en/api)
+2.  Clique em "Get your free API key".
+3.  Crie uma conta ou faça login.
+4.  Sua chave de API será exibida no seu painel de controle.
+
+## 6. Limites das APIs (Planos Gratuitos)
 
 ### ExchangeRate-API:
 *   **1.500 requisições por mês.**
@@ -106,6 +115,23 @@ Defina a variável de ambiente `OPENEXCHANGERATES_APP_ID` com o seu App ID da Op
 *   **Linux/macOS:**
     ```bash
     export OPENEXCHANGERATES_APP_ID=SEU_APP_ID_AQUI
+    ```
+
+### 🔑 Configurando `COINGECKO_API_KEY` (para CoinGecko)
+
+Defina a variável de ambiente `COINGECKO_API_KEY` com a sua chave da API obtida no passo 5.
+
+*   **Windows (CMD):**
+    ```cmd
+    set COINGECKO_API_KEY=SUA_CHAVE_AQUI
+    ```
+*   **Windows (PowerShell):**
+    ```powershell
+    $env:COINGECKO_API_KEY="SUA_CHAVE_AQUI"
+    ```
+*   **Linux/macOS:**
+    ```bash
+    export COINGECKO_API_KEY=SUA_CHAVE_AQUI
     ```
 
 ---

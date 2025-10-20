@@ -6,7 +6,9 @@ public class ApiConfig {
     private static ApiConfig instance;
     private String apiKey;
     private String openExchangeRatesAppId;
+    private String coinGeckoApiKey;
     private final String BASE_URL = "https://v6.exchangerate-api.com/v6/";
+    private final String COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3/";
 
     // Supported currencies as constants
     public static final String ARS = "ARS";
@@ -47,6 +49,11 @@ public class ApiConfig {
             System.err.println("Warning: App ID for OpenExchangeRates not found. Please set the environment variable OPENEXCHANGERATES_APP_ID if you intend to use it as a fallback.");
             // Not throwing an exception here, as OpenExchangeRates might be a fallback and not strictly required if primary works.
         }
+
+        coinGeckoApiKey = System.getenv("COINGECKO_API_KEY");
+        if (coinGeckoApiKey == null || coinGeckoApiKey.trim().isEmpty()) {
+            System.err.println("Warning: API Key for CoinGecko not found. Please set the environment variable COINGECKO_API_KEY if you intend to use it.");
+        }
     }
 
     public String getApiKey() {
@@ -57,7 +64,15 @@ public class ApiConfig {
         return openExchangeRatesAppId;
     }
 
+    public String getCoinGeckoApiKey() {
+        return coinGeckoApiKey;
+    }
+
     public String buildPairConversionUrl(String baseCurrency, String targetCurrency) {
         return BASE_URL + apiKey + "/pair/" + baseCurrency + "/" + targetCurrency;
+    }
+
+    public String buildCoinGeckoSimplePriceUrl(String crypto, String currency) {
+        return COINGECKO_BASE_URL + "simple/price?ids=" + crypto + "&vs_currencies=" + currency + "&x_cg_demo_api_key=" + coinGeckoApiKey;
     }
 }

@@ -47,14 +47,16 @@ public class MenuPrincipal {
         System.out.println("4) Ver taxas disponíveis");
         System.out.println("5) Ver Estatísticas");
         System.out.println("6) Selecionar API de Câmbio (Atual: " + preferredApi + ")");
-        System.out.println("7) Sair");
+        System.out.println("7) Converter Criptomoeda para Moeda");
+        System.out.println("8) Converter Criptomoeda para Criptomoeda");
+        System.out.println("9) Sair");
         System.out.println("========================================");
         System.out.print("Escolha uma opção: ");
     }
 
     public void executar() {
         int opcao = 0;
-        while (opcao != 7) { // Change loop termination condition to option 7 (Sair)
+        while (opcao != 9) { // Change loop termination condition to option 9 (Sair)
             clearScreen(); // Clear screen before displaying menu
             exibirMenu();
             try {
@@ -81,11 +83,17 @@ public class MenuPrincipal {
                         selecionarApi();
                         break;
                     case 7:
+                        realizarConversaoCripto();
+                        break;
+                    case 8:
+                        realizarConversaoCriptoParaCripto();
+                        break;
+                    case 9:
                         System.out.println("Saindo do Conversor de Moedas. Até logo!");
                         logger.log(Level.INFO, "Aplicação encerrada.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Por favor, escolha uma opção entre 1 e 7.");
+                        System.out.println("Opção inválida. Por favor, escolha uma opção entre 1 e 9.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida. Por favor, digite um número.");
@@ -161,6 +169,16 @@ public class MenuPrincipal {
     private void verEstatisticas() {
         clearScreen(); // Clear screen before displaying option content
         estatisticas.exibirEstatisticas();
+    }
+
+    private void realizarConversaoCripto() throws IOException, InterruptedException {
+        clearScreen();
+        interfaceConversao.realizarConversaoCripto(scanner, conversorMoedas);
+    }
+
+    private void realizarConversaoCriptoParaCripto() throws IOException, InterruptedException {
+        clearScreen();
+        interfaceConversao.realizarConversaoCriptoParaCripto(scanner, conversorMoedas);
     }
 
     public static void main(String[] args) {

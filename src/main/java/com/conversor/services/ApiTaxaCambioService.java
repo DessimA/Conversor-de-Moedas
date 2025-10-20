@@ -16,6 +16,7 @@ public class ApiTaxaCambioService implements ApiTaxaCambio {
     private static final Logger logger = LoggerUtil.getLogger(ApiTaxaCambioService.class.getName());
     private final ApiTaxaCambio primaryApi;
     private final ApiTaxaCambio fallbackApi;
+    private final ApiTaxaCambio coinGeckoApi;
     private final Map<String, TaxaCambio> cacheTaxas;
     private final String preferredApiName;
 
@@ -26,6 +27,7 @@ public class ApiTaxaCambioService implements ApiTaxaCambio {
         // Initialize API implementations
         ApiTaxaCambio exchangeRateApi = new ExchangeRateApiImpl(apiConfig);
         ApiTaxaCambio openExchangeRatesApi = new OpenExchangeRatesApiImpl(apiConfig.getOpenExchangeRatesAppId());
+        this.coinGeckoApi = new CoinGeckoApiImpl(apiConfig.getCoinGeckoApiKey());
 
         if ("EXCHANGERATE_API".equalsIgnoreCase(preferredApiName)) {
             this.primaryApi = exchangeRateApi;
@@ -52,6 +54,14 @@ public class ApiTaxaCambioService implements ApiTaxaCambio {
             return cachedRate;
         }
 
+        if (origem.isCrypto()) {
+            return obterTaxaCambioCripto(origem, destino);
+        }
+
+        if (destino.isCrypto()) {
+            throw new IllegalArgumentException("Não é possível converter uma moeda fiduciária para uma criptomoeda com esta função.");
+        }
+
         // 2. Try primary API
         try {
             logger.log(Level.INFO, "Tentando obter taxa de câmbio da API primária: {0}", primaryApi.getClass().getSimpleName());
@@ -73,6 +83,34 @@ public class ApiTaxaCambioService implements ApiTaxaCambio {
                 throw new RuntimeException("Não foi possível obter a taxa de câmbio de nenhuma API disponível.", fallbackE);
             }
         }
+    }
+
+    private TaxaCambio obterTaxaCambioCripto(Moeda origem, Moeda destino) throws IOException, InterruptedException, RuntimeException {
+        logger.log(Level.INFO, "Iniciando conversão de criptomoeda de {0} para {1}", new Object[]{origem.getCodigo(), destino.getCodigo()});
+
+        // 1. Get crypto price in USD from CoinGecko
+        TaxaCambio cryptoToUsdRate = coinGeckoApi.obterTaxaCambio(origem, Moeda.USD);
+        logger.log(Level.INFO, "Taxa de {0} para USD obtida da CoinGecko: {1}", new Object[]{origem.getCodigo(), cryptoToUsdRate.taxa()});
+
+        if (destino.equals(Moeda.USD)) {
+            return cryptoToUsdRate;
+        }
+
+        if (destino.isCrypto()) {
+            TaxaCambio cryptoToUsdRate2 = coinGeckoApi.obterTaxaCambio(destino, Moeda.USD);
+            double finalRate = cryptoToUsdRate.taxa() / cryptoToUsdRate2.taxa();
+            return new TaxaCambio(origem, destino, finalRate, LocalDateTime.now());
+        }
+
+        // 2. Get USD to target currency rate from primary/fallback API
+        TaxaCambio usdToTargetRate = obterTaxaCambio(Moeda.USD, destino);
+        logger.log(Level.INFO, "Taxa de USD para {0} obtida: {1}", new Object[]{destino.getCodigo(), usdToTargetRate.taxa()});
+
+        // 3. Calculate the final rate
+        double finalRate = cryptoToUsdRate.taxa() * usdToTargetRate.taxa();
+        logger.log(Level.INFO, "Taxa final calculada de {0} para {1}: {2}", new Object[]{origem.getCodigo(), destino.getCodigo(), finalRate});
+
+        return new TaxaCambio(origem, destino, finalRate, LocalDateTime.now());
     }
 
     private boolean isCacheValid(TaxaCambio cachedRate) {

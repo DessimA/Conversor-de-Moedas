@@ -15,7 +15,19 @@ public enum Moeda {
     CHF("CHF", "Franco Suíço", "CHF"),
     CNY("CNY", "Yuan Chinês", "¥"),
     MXN("MXN", "Peso Mexicano", "$"),
-    INR("INR", "Rúpia Indiana", "₹");
+    INR("INR", "Rúpia Indiana", "₹"),
+
+    // Cryptocurrencies
+    BTC("BTC", "Bitcoin", "₿"),
+    ETH("ETH", "Ethereum", "Ξ"),
+    USDT("USDT", "Tether", "$"),
+    BNB("BNB", "Binance Coin", "BNB"),
+    SOL("SOL", "Solana", "SOL"),
+    XRP("XRP", "XRP", "XRP"),
+    USDC("USDC", "USD Coin", "$"),
+    ADA("ADA", "Cardano", "ADA"),
+    AVAX("AVAX", "Avalanche", "AVAX"),
+    DOGE("DOGE", "Dogecoin", "DOGE");
 
     private final String codigo;
     private final String nomeCompleto;
@@ -25,6 +37,14 @@ public enum Moeda {
         this.codigo = codigo;
         this.nomeCompleto = nomeCompleto;
         this.simbolo = simbolo;
+    }
+
+    public boolean isCrypto() {
+        return this == BTC || this == ETH || this == USDT || this == BNB || this == SOL || this == XRP || this == USDC || this == ADA || this == AVAX || this == DOGE;
+    }
+
+    public boolean isFiat() {
+        return !isCrypto();
     }
 
     public String getCodigo() {

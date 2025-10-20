@@ -119,17 +119,35 @@ Este documento detalha os cenários de teste manual para o Conversor de Moedas e
 - **Resultado Esperado:** Um arquivo TXT deve ser criado na pasta `logs` com o histórico formatado.
 - **Resultado Obtido:** [A preencher]
 
-### 13. Teste de Seleção de API
-- **Descrição:** Verificar se o usuário pode selecionar a API preferencial e se a aplicação utiliza a API escolhida.
+### 13. Teste de Conversão de Criptomoeda para Moeda Fiduciária
+- **Descrição:** Converter um valor de uma criptomoeda para uma moeda fiduciária (ex: BTC para USD).
 - **Passos:**
   1. Iniciar a aplicação.
-  2. Selecionar a opção 'Selecionar API de Câmbio'.
-  3. Escolher '2' (OpenExchangeRates).
-  4. Realizar uma conversão (ex: USD para BRL).
-  5. Sair da aplicação.
-  6. Iniciar a aplicação novamente.
-  7. Selecionar a opção 'Selecionar API de Câmbio'.
-  8. Escolher '1' (ExchangeRate-API).
-  9. Realizar uma conversão (ex: USD para BRL).
-- **Resultado Esperado:** O log deve indicar que a API selecionada foi utilizada para a conversão. Ao reiniciar a aplicação, a API padrão deve ser 'EXCHANGERATE_API' (ou a definida via `api.preferred` no `System.getProperty`), e a seleção manual deve sobrescrever essa preferência para as conversões subsequentes.
+  2. Selecionar a opção 'Converter Criptomoeda para Moeda Fiduciária'.
+  3. Escolher BTC como moeda de origem.
+  4. Escolher USD como moeda de destino.
+  5. Digitar um valor (ex: 1).
+- **Resultado Esperado:** Exibição do valor convertido corretamente, com a taxa utilizada e símbolos das moedas. A conversão deve ser registrada no histórico.
+- **Resultado Obtido:** [A preencher]
+
+### 14. Teste de Conversão de Criptomoeda para Criptomoeda
+- **Descrição:** Converter um valor de uma criptomoeda para outra (ex: BTC para ETH).
+- **Passos:**
+  1. Iniciar a aplicação.
+  2. Selecionar a opção 'Converter Criptomoeda para Criptomoeda'.
+  3. Escolher BTC como moeda de origem.
+  4. Escolher ETH como moeda de destino.
+  5. Digitar um valor (ex: 1).
+- **Resultado Esperado:** Exibição do valor convertido corretamente, com a taxa utilizada e símbolos das moedas. A conversão deve ser registrada no histórico.
+- **Resultado Obtido:** [A preencher]
+
+### 15. Teste de Conversão de Moeda Fiduciária para Criptomoeda (Inválido)
+- **Descrição:** Tentar converter um valor de uma moeda fiduciária para uma criptomoeda.
+- **Passos:**
+  1. Iniciar a aplicação.
+  2. Selecionar a opção 'Converter moeda'.
+  3. Escolher USD como moeda de origem.
+  4. Escolher BTC como moeda de destino.
+  5. Digitar um valor (ex: 100).
+- **Resultado Esperado:** Mensagem de erro indicando que não é possível converter uma moeda fiduciária para uma criptomoeda com esta função.
 - **Resultado Obtido:** [A preencher]

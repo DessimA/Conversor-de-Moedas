@@ -25,10 +25,50 @@ public class InterfaceConversao {
     public void exibirMenuSelecaoMoeda() {
         System.out.println("\n--- Seleção de Moeda ---");
         Moeda[] moedas = Moeda.values();
-        for (int i = 0; i < moedas.length; i++) {
-            System.out.printf("%d) %s - %s (%s)%n", (i + 1), moedas[i].getCodigo(), moedas[i].getNomeCompleto(), moedas[i].getSimbolo());
+        int index = 1;
+        for (Moeda moeda : moedas) {
+            if (moeda.isFiat()) {
+                System.out.printf("%d) %s - %s (%s)%n", index++, moeda.getCodigo(), moeda.getNomeCompleto(), moeda.getSimbolo());
+            }
         }
         System.out.print("------------------------\n");
+    }
+
+    public void exibirMenuSelecaoCripto() {
+        System.out.println("\n--- Seleção de Criptomoeda ---");
+        Moeda[] moedas = Moeda.values();
+        int index = 1;
+        for (Moeda moeda : moedas) {
+            if (moeda.isCrypto()) {
+                System.out.printf("%d) %s - %s (%s)%n", index++, moeda.getCodigo(), moeda.getNomeCompleto(), moeda.getSimbolo());
+            }
+        }
+        System.out.print("------------------------\n");
+    }
+
+    public Moeda selecionarCripto(Scanner scanner, String prompt) {
+        Moeda[] moedas = Moeda.values();
+        while (true) {
+            System.out.print(prompt);
+            try {
+                int escolha = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                int cryptoIndex = 0;
+                for (int i = 0; i < moedas.length; i++) {
+                    if (moedas[i].isCrypto()) {
+                        cryptoIndex++;
+                        if (cryptoIndex == escolha) {
+                            return moedas[i];
+                        }
+                    }
+                }
+                System.out.println("Opção inválida. Por favor, escolha um número da lista.");
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
+                logger.log(Level.WARNING, "Entrada inválida na seleção de moeda: {0}", scanner.nextLine());
+                scanner.nextLine(); // Consume the invalid input
+            }
+        }
     }
 
     public Moeda selecionarMoeda(Scanner scanner, String prompt) {
@@ -38,11 +78,16 @@ public class InterfaceConversao {
             try {
                 int escolha = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
-                if (escolha > 0 && escolha <= moedas.length) {
-                    return moedas[escolha - 1];
-                } else {
-                    System.out.println("Opção inválida. Por favor, escolha um número da lista.");
+                int fiatIndex = 0;
+                for (int i = 0; i < moedas.length; i++) {
+                    if (moedas[i].isFiat()) {
+                        fiatIndex++;
+                        if (fiatIndex == escolha) {
+                            return moedas[i];
+                        }
+                    }
                 }
+                System.out.println("Opção inválida. Por favor, escolha um número da lista.");
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida. Por favor, digite um número.");
                 logger.log(Level.WARNING, "Entrada inválida na seleção de moeda: {0}", scanner.nextLine());
@@ -78,6 +123,80 @@ public class InterfaceConversao {
                 exibirMenuSelecaoMoeda();
                 Moeda origem = selecionarMoeda(scanner, "Selecione a moeda de origem: ");
                 Moeda destino = selecionarMoeda(scanner, "Selecione a moeda de destino: ");
+                double valor = solicitarValor(scanner);
+
+                ConversaoResultado resultado = conversorMoedas.converter(valor, origem, destino);
+
+                System.out.printf("\n%s %.2f %s = %s %.2f %s (Taxa: %.4f)%n",
+                        origem.getCodigo(), resultado.valorOriginal(), origem.getSimbolo(),
+                        destino.getCodigo(), resultado.valorConvertido(), destino.getSimbolo(),
+                        resultado.taxaUtilizada());
+
+            } catch (InputMismatchException e) {
+                System.out.println("Erro de entrada: Por favor, digite um valor válido.");
+                logger.log(Level.WARNING, "Erro de InputMismatchException durante conversão: {0}", e.getMessage());
+            } catch (RuntimeException e) { // IllegalArgumentException is a subclass of RuntimeException
+                System.out.println("Erro: " + e.getMessage());
+                logger.log(Level.WARNING, "Erro durante conversão: {0}", e.getMessage());
+            } catch (IOException | InterruptedException e) {
+                System.err.println("Erro de comunicação com a API: " + e.getMessage());
+                logger.log(Level.SEVERE, "Erro de API durante conversão: {0}", e.getMessage());
+                throw e; // Re-throw to be handled by MenuPrincipal
+            }
+
+            System.out.print("\nDeseja fazer outra conversão? (s/n): ");
+            String resposta = scanner.nextLine().trim().toLowerCase();
+            if (!resposta.equals("s")) {
+                continuar = false;
+            }
+        }
+    }
+
+    public void realizarConversaoCripto(Scanner scanner, ConversorMoedas conversorMoedas) throws IOException, InterruptedException {
+        boolean continuar = true;
+        while (continuar) {
+            try {
+                exibirMenuSelecaoCripto();
+                Moeda origem = selecionarCripto(scanner, "Selecione a criptomoeda de origem: ");
+                exibirMenuSelecaoMoeda();
+                Moeda destino = selecionarMoeda(scanner, "Selecione a moeda de destino: ");
+                double valor = solicitarValor(scanner);
+
+                ConversaoResultado resultado = conversorMoedas.converter(valor, origem, destino);
+
+                System.out.printf("\n%s %.2f %s = %s %.2f %s (Taxa: %.4f)%n",
+                        origem.getCodigo(), resultado.valorOriginal(), origem.getSimbolo(),
+                        destino.getCodigo(), resultado.valorConvertido(), destino.getSimbolo(),
+                        resultado.taxaUtilizada());
+
+            } catch (InputMismatchException e) {
+                System.out.println("Erro de entrada: Por favor, digite um valor válido.");
+                logger.log(Level.WARNING, "Erro de InputMismatchException durante conversão: {0}", e.getMessage());
+            } catch (RuntimeException e) { // IllegalArgumentException is a subclass of RuntimeException
+                System.out.println("Erro: " + e.getMessage());
+                logger.log(Level.WARNING, "Erro durante conversão: {0}", e.getMessage());
+            } catch (IOException | InterruptedException e) {
+                System.err.println("Erro de comunicação com a API: " + e.getMessage());
+                logger.log(Level.SEVERE, "Erro de API durante conversão: {0}", e.getMessage());
+                throw e; // Re-throw to be handled by MenuPrincipal
+            }
+
+            System.out.print("\nDeseja fazer outra conversão? (s/n): ");
+            String resposta = scanner.nextLine().trim().toLowerCase();
+            if (!resposta.equals("s")) {
+                continuar = false;
+            }
+        }
+    }
+
+    public void realizarConversaoCriptoParaCripto(Scanner scanner, ConversorMoedas conversorMoedas) throws IOException, InterruptedException {
+        boolean continuar = true;
+        while (continuar) {
+            try {
+                exibirMenuSelecaoCripto();
+                Moeda origem = selecionarCripto(scanner, "Selecione a criptomoeda de origem: ");
+                exibirMenuSelecaoCripto();
+                Moeda destino = selecionarCripto(scanner, "Selecione a criptomoeda de destino: ");
                 double valor = solicitarValor(scanner);
 
                 ConversaoResultado resultado = conversorMoedas.converter(valor, origem, destino);
