@@ -44,8 +44,8 @@ flowchart TD
     A[Início] --> B[Exibir Menu Principal]
     B --> C{Opção Selecionada}
     C -->|1| D[Converter Moeda Fiduciária]
-    C -->|2| E[Converter Cripto para Moeda]
-    C -->|3| F[Converter Cripto para Cripto]
+    C -->|2| E[Converter Criptomoeda para Moeda Fiduciária]
+    C -->|3| F[Converter Criptomoeda para Criptomoeda]
     C -->|4| G[Ver Histórico]
     C -->|5| H[Limpar Histórico]
     C -->|6| I[Ver Taxas Disponíveis]
@@ -66,12 +66,12 @@ flowchart TD
     U --> V[Registrar Log]
     V --> B
 
-    E --> W[Selecionar Cripto Origem]
+    E --> W[Selecionar Criptomoeda Origem]
     W --> X[Selecionar Moeda Destino]
     X --> O
 
-    F --> Y[Selecionar Cripto Origem]
-    Y --> Z[Selecionar Cripto Destino]
+    F --> Y[Selecionar Criptomoeda Origem]
+    Y --> Z[Selecionar Criptomoeda Destino]
     Z --> O
 
     G --> AA[Carregar Histórico]
@@ -82,7 +82,7 @@ flowchart TD
     CC --> DD[Limpar Dados]
     DD --> B
     
-    I --> EE[Exibir Moedas e Criptos]
+    I --> EE[Exibir Moedas e Criptomoedas]
     EE --> B
     
     J --> FF[Calcular Estatísticas]
@@ -91,7 +91,7 @@ flowchart TD
     
     K --> HH[Apresentar Opções de API]
     HH --> II[Usuário Seleciona API]
-    II --> JJ[Re-inicializar Serviços]
+    II --> JJ[Re-inicializar Serviços com Nova API]
     JJ --> B
     
     L --> KK[Salvar Estado]
@@ -109,40 +109,183 @@ classDiagram
         -Scanner scanner
         -ConversorMoedas conversor
         -HistoricoConversao historico
+        -Estatisticas estatisticas
+        -String preferredApi
         +exibirMenu()
         +executar()
+        -selecionarApi()
+        -realizarConversao()
+        -realizarConversaoCripto()
+        -realizarConversaoCriptoParaCripto()
+        -verHistorico()
+        -limparHistorico()
+        -verTaxasDisponiveis()
+        -verEstatisticas()
+        -inicializarServicos()
+        -clearScreen()
     }
     
     class Moeda {
         <<enumeration>>
-        USD, BRL, EUR, BTC, ETH
+        ARS, BOB, BRL, CLP, COP, USD, EUR, GBP, JPY, AUD, CAD, CHF, CNY, MXN, INR
+        BTC, ETH, USDT, BNB, SOL, XRP, USDC, ADA, AVAX, DOGE
+        -String codigo
+        -String nomeCompleto
+        -String simbolo
+        +getCodigo()
+        +getNomeCompleto()
+        +getSimbolo()
         +isCrypto()
         +isFiat()
+        +fromCodigo(String)
+    }
+    
+    class TaxaCambio {
+        -Moeda origem
+        -Moeda destino
+        -double taxa
+        -LocalDateTime timestamp
+    }
+    
+    class ConversaoResultado {
+        -double valorOriginal
+        -Moeda moedaOrigem
+        -double valorConvertido
+        -Moeda moedaDestino
+        -double taxaUtilizada
+        -LocalDateTime dataHora
+    }
+    
+    class ConversorMoedas {
+        -ApiTaxaCambio apiService
+        -HistoricoConversao historico
+        +converter(double, Moeda, Moeda)
     }
     
     class ApiTaxaCambioService {
         -ApiTaxaCambio primaryApi
         -ApiTaxaCambio fallbackApi
         -ApiTaxaCambio coinGeckoApi
+        -Map~String,TaxaCambio~ cache
+        -String preferredApiName
+        +ApiTaxaCambioService(ApiConfig, String)
         +obterTaxaCambio(Moeda, Moeda)
+        -obterTaxaCambioCripto(Moeda, Moeda)
+        -isCacheValid(TaxaCambio)
+        +limparCacheExpirado()
     }
 
     class ApiTaxaCambio {
         <<interface>>
-        obterTaxaCambio()
+        obterTaxaCambio(Moeda, Moeda)
     }
     
-    class ExchangeRateApiImpl
-    class OpenExchangeRatesApiImpl
-    class CoinGeckoApiImpl
+    class ExchangeRateApiImpl {
+        -HttpClient client
+        -ApiConfig apiConfig
+        -JsonParser jsonParser
+        +obterTaxaCambio(Moeda, Moeda)
+    }
+
+    class OpenExchangeRatesApiImpl {
+        -HttpClient client
+        -Gson gson
+        -String appId
+        +obterTaxaCambio(Moeda, Moeda)
+    }
+
+    class CoinGeckoApiImpl {
+        -HttpClient client
+        -Gson gson
+        -String apiKey
+        +obterTaxaCambio(Moeda, Moeda)
+    }
+    
+    class HistoricoConversao {
+        -List~ConversaoResultado~ conversoes
+        +adicionarConversao(ConversaoResultado)
+        +getUltimasConversoes(int)
+        +getTodasConversoes()
+        +limparHistorico()
+        +estaVazio()
+        -salvarEmArquivo()
+        -carregarDeArquivo()
+    }
+
+    class Estatisticas {
+        -HistoricoConversao historico
+        -Scanner scanner
+        +exibirEstatisticas()
+    }
+
+    class InterfaceConversao {
+        -Logger logger
+        +exibirMenuSelecaoMoeda()
+        +exibirMenuSelecaoCripto()
+        +selecionarMoeda(Scanner, String)
+        +selecionarCripto(Scanner, String)
+        +solicitarValor(Scanner)
+        +realizarConversao(Scanner, ConversorMoedas)
+        +realizarConversaoCripto(Scanner, ConversorMoedas)
+        +realizarConversaoCriptoParaCripto(Scanner, ConversorMoedas)
+        +exibirHistorico(Scanner, HistoricoConversao)
+        +limparHistorico(Scanner, HistoricoConversao)
+        -exportarHistoricoParaTxt(List)
+    }
+
+    class ApiConfig {
+        -ApiConfig instance
+        -String apiKey
+        -String openExchangeRatesAppId
+        -String coinGeckoApiKey
+        -String BASE_URL
+        -String COINGECKO_BASE_URL
+        +getInstance()
+        -loadApiKey()
+        +getApiKey()
+        +getOpenExchangeRatesAppId()
+        +getCoinGeckoApiKey()
+        +buildPairConversionUrl(String, String)
+        +buildCoinGeckoSimplePriceUrl(String, String)
+    }
+
+    class JsonParser {
+        -Gson gson
+        +parseConversionRate(String, String, String)
+    }
+
+    class LoggerUtil {
+        -String LOG_FILE_PATH
+        -int MAX_LOG_FILE_SIZE
+        -int MAX_LOG_FILE_COUNT
+        +getLogger(String)
+    }
     
     Main --> MenuPrincipal
     MenuPrincipal --> ConversorMoedas
+    MenuPrincipal --> HistoricoConversao
+    MenuPrincipal --> Estatisticas
+    MenuPrincipal --> InterfaceConversao
     ConversorMoedas --> ApiTaxaCambioService
     ApiTaxaCambioService ..|> ApiTaxaCambio
+    ApiTaxaCambioService --> ExchangeRateApiImpl
+    ApiTaxaCambioService --> OpenExchangeRatesApiImpl
+    ApiTaxaCambioService --> CoinGeckoApiImpl
     ExchangeRateApiImpl ..|> ApiTaxaCambio
     OpenExchangeRatesApiImpl ..|> ApiTaxaCambio
     CoinGeckoApiImpl ..|> ApiTaxaCambio
+    ConversaoResultado --> Moeda
+    TaxaCambio --> Moeda
+    ApiTaxaCambioService --> ApiConfig
+    ExchangeRateApiImpl --> ApiConfig
+    CoinGeckoApiImpl --> ApiConfig
+    ExchangeRateApiImpl --> JsonParser
+    ApiTaxaCambioService --> LoggerUtil
+    MenuPrincipal --> LoggerUtil
+    InterfaceConversao --> LoggerUtil
+    HistoricoConversao --> LoggerUtil
+    ConversorMoedas --> LoggerUtil
+    ApiConfig --> LoggerUtil
 ```
 
 ## 📦 Estrutura do Projeto
@@ -155,7 +298,11 @@ conversor-moedas/
 ├── README.md
 ├── TESTES.md
 ├── data/
-│   └── historico.json
+│   ├── historico.json
+│   └── historico.json.bak
+├── docs/
+│   ├── capturas/
+│   └── fluxogramas/
 ├── logs/
 │   └── conversoes.log
 └── src/
@@ -163,11 +310,26 @@ conversor-moedas/
         └── java/
             └── com/
                 └── conversor/
+                    ├── Estatisticas.java
+                    ├── InterfaceConversao.java
                     ├── Main.java
                     ├── MenuPrincipal.java
                     ├── models/
+                    │   ├── ConversaoResultado.java
+                    │   ├── HistoricoConversao.java
+                    │   ├── Moeda.java
+                    │   └── TaxaCambio.java
                     ├── services/
+                    │   ├── ApiTaxaCambio.java
+                    │   ├── ApiTaxaCambioService.java
+                    │   ├── CoinGeckoApiImpl.java
+                    │   ├── ConversorMoedas.java
+                    │   ├── ExchangeRateApiImpl.java
+                    │   └── OpenExchangeRatesApiImpl.java
                     └── utils/
+                        ├── ApiConfig.java
+                        ├── JsonParser.java
+                        └── LoggerUtil.java
 ```
 
 ## 🚀 Como Executar
