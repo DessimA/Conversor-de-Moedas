@@ -212,9 +212,9 @@ classDiagram
         +converter(double, Moeda, Moeda): ConversaoResultado
     }
     
-    interface ApiTaxaCambio {
-        +obterTaxaCambio(Moeda, Moeda): TaxaCambio
-    }
+    class ApiTaxaCambio {
+        <<interface>>
+        +obterTaxaCambio(Moeda, Moeda) TaxaCambio
 
     class ApiTaxaCambioService {
         -ApiTaxaCambio primaryApi
