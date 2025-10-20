@@ -215,6 +215,7 @@ classDiagram
     class ApiTaxaCambio {
         <<interface>>
         +obterTaxaCambio(Moeda, Moeda) TaxaCambio
+    }
 
     class ApiTaxaCambioService {
         -ApiTaxaCambio primaryApi
