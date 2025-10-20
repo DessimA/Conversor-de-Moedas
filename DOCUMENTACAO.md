@@ -132,7 +132,7 @@ P1 --> P2[MenuPrincipal.inicializarServicos() para recarregar APIs]
 P2 --> F
 
     S --> Z[Fim da Aplicação]
-
+```
 
 ## 🛡️ Tratamento de Erros
 A robustez da aplicação é garantida por um tratamento de erros abrangente.
