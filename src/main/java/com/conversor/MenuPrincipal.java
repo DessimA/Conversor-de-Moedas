@@ -16,22 +16,25 @@ import java.util.logging.Logger;
 public class MenuPrincipal {
     private static final Logger logger = LoggerUtil.getLogger(MenuPrincipal.class.getName());
     private final Scanner scanner;
-    private final ConversorMoedas conversorMoedas;
+    private ConversorMoedas conversorMoedas; // Changed to non-final
     private final HistoricoConversao historicoConversao;
-    private final InterfaceConversao interfaceConversao;
+    private InterfaceConversao interfaceConversao; // Changed to non-final
     private final Estatisticas estatisticas;
+    private String preferredApi; // New field for preferred API
 
     public MenuPrincipal() {
         this.scanner = new Scanner(System.in);
-        ApiConfig apiConfig = ApiConfig.getInstance();
-        // Load preferred API from config.properties or default
-        String preferredApi = System.getProperty("api.preferred", "EXCHANGERATE_API");
-        ApiTaxaCambioService apiTaxaCambioService = new ApiTaxaCambioService(apiConfig, preferredApi);
-
         this.historicoConversao = new HistoricoConversao(); // Will be loaded from file later
-        this.conversorMoedas = new ConversorMoedas(apiTaxaCambioService, historicoConversao);
-        this.interfaceConversao = new InterfaceConversao();
         this.estatisticas = new Estatisticas(historicoConversao, scanner);
+        this.preferredApi = System.getProperty("api.preferred", "EXCHANGERATE_API"); // Default from system property or hardcoded
+        inicializarServicos(); // Initialize services with default/preferred API
+    }
+
+    private void inicializarServicos() {
+        ApiConfig apiConfig = ApiConfig.getInstance();
+        ApiTaxaCambioService apiTaxaCambioService = new ApiTaxaCambioService(apiConfig, preferredApi);
+        this.conversorMoedas = new ConversorMoedas(apiTaxaCambioService, historicoConversao);
+        this.interfaceConversao = new InterfaceConversao(); // Re-initialize if needed, or ensure it's stateless
     }
 
     public void exibirMenu() {
@@ -43,14 +46,15 @@ public class MenuPrincipal {
         System.out.println("3) Limpar histórico");
         System.out.println("4) Ver taxas disponíveis");
         System.out.println("5) Ver Estatísticas");
-        System.out.println("6) Sair");
+        System.out.println("6) Selecionar API de Câmbio (Atual: " + preferredApi + ")");
+        System.out.println("7) Sair");
         System.out.println("========================================");
         System.out.print("Escolha uma opção: ");
     }
 
     public void executar() {
         int opcao = 0;
-        while (opcao != 6) { // Change loop termination condition to option 6 (Sair)
+        while (opcao != 7) { // Change loop termination condition to option 7 (Sair)
             clearScreen(); // Clear screen before displaying menu
             exibirMenu();
             try {
@@ -74,11 +78,14 @@ public class MenuPrincipal {
                         verEstatisticas();
                         break;
                     case 6:
+                        selecionarApi();
+                        break;
+                    case 7:
                         System.out.println("Saindo do Conversor de Moedas. Até logo!");
                         logger.log(Level.INFO, "Aplicação encerrada.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Por favor, escolha uma opção entre 1 e 6.");
+                        System.out.println("Opção inválida. Por favor, escolha uma opção entre 1 e 7.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida. Por favor, digite um número.");
@@ -90,6 +97,39 @@ public class MenuPrincipal {
             }
         }
         scanner.close();
+    }
+
+    private void selecionarApi() {
+        clearScreen();
+        System.out.println("\n--- Selecionar API de Câmbio ---");
+        System.out.println("1) ExchangeRate-API (Padrão)");
+        System.out.println("2) OpenExchangeRates");
+        System.out.print("Escolha a API preferencial: ");
+        try {
+            int apiChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (apiChoice) {
+                case 1:
+                    preferredApi = "EXCHANGERATE_API";
+                    System.out.println("API selecionada: ExchangeRate-API");
+                    break;
+                case 2:
+                    preferredApi = "OPENEXCHANGERATES";
+                    System.out.println("API selecionada: OpenExchangeRates");
+                    break;
+                default:
+                    System.out.println("Opção inválida. Usando ExchangeRate-API como padrão.");
+                    preferredApi = "EXCHANGERATE_API";
+            }
+            inicializarServicos(); // Re-initialize services with new API
+            System.out.print("Pressione ENTER para voltar ao menu...");
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número.");
+            logger.log(Level.WARNING, "Entrada inválida na seleção de API: {0}", scanner.nextLine());
+            scanner.nextLine(); // Consume the invalid input
+        }
     }
 
     private void realizarConversao() throws IOException, InterruptedException {
