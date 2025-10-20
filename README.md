@@ -38,9 +38,6 @@ O **Conversor de Moedas** é uma aplicação de console robusta, desenvolvida em
 
 ## 🔄 Fluxogramas
 
-<details>
-<summary>Ver Fluxogramas</summary>
-
 ### FLUXO PRINCIPAL DA APLICAÇÃO
 ```mermaid
 flowchart TD
@@ -147,8 +144,6 @@ classDiagram
     OpenExchangeRatesApiImpl ..|> ApiTaxaCambio
     CoinGeckoApiImpl ..|> ApiTaxaCambio
 ```
-
-</details>
 
 ## 📦 Estrutura do Projeto
 ```
