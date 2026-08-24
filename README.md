@@ -1,491 +1,240 @@
-<h1 align="center">Conversor de Moedas</h1>
+# Conversor de Moedas
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Java-17-blue.svg" alt="Java 17">
-  <img src="https://img.shields.io/badge/Gson-2.10.1-blue.svg" alt="Gson 2.10.1">
-  <img src="https://img.shields.io/badge/API-ExchangeRate-red.svg" alt="APIs">
-  <img src="https://img.shields.io/badge/API-OpenExchangeRates-green.svg" alt="APIs">
-  <img src="https://img.shields.io/badge/API-CoinGecko-orange.svg" alt="APIs">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License MIT">
-</p>
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
+![Status](https://img.shields.io/badge/status-production-success?style=flat-square)
+![Stack](https://img.shields.io/badge/stack-Java%2017%20%7C%20Gson%20%7C%20Lombok-yellow?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-Multiplataforma-blueviolet?style=flat-square)
 
-## 📋 Descrição
-O Conversor de Moedas é uma aplicação Java console que permite converter valores entre 15 moedas diferentes e diversas criptomoedas, usando taxas de câmbio em tempo real. A aplicação oferece histórico de conversões, logs detalhados e estatísticas de uso.
+O **Conversor de Moedas** é um conversor de moedas em Java 17 que interage com 15 moedas fiduciárias e diversas criptomoedas via APIs externas. Utiliza Gson para serialização JSON, Lombok para redução de boilerplate e HttpClient nativo para requisições HTTP.
 
-## ⚙️ Funcionalidades
-- ✅ Conversão entre 15 moedas fiduciárias (ARS, BOB, BRL, CLP, COP, USD, EUR, GBP, JPY, AUD, CAD, CHF, CNY, MXN, INR)
-- ✅ Conversão entre diversas criptomoedas (BTC, ETH, USDT, BNB, SOL, XRP, USDC, ADA, AVAX, DOGE)
-- ✅ Conversão entre moedas fiduciárias e criptomoedas
-- ✅ Taxas de câmbio atualizadas em tempo real através de múltiplas APIs (ExchangeRate-API, OpenExchangeRates, CoinGecko)
-- ✅ Cache de taxas para otimizar performance e reduzir chamadas à API
-- ✅ Histórico completo de conversões com persistência em arquivo JSON
-- ✅ Sistema de logs detalhado para monitoramento de operações e erros
-- ✅ Estatísticas de uso (total de conversões, moedas mais utilizadas, valores médios)
-- ✅ Interface interativa via console com menus claros e validação de entrada
-- ✅ Suporte para múltiplas APIs de câmbio com seleção de API preferencial
-- ✅ Fallback automático entre APIs em caso de falha
-- ✅ Exportação do histórico de conversões para arquivo TXT
+## Índice
 
-## 🛠️ Tecnologias Utilizadas
-- **Java JDK 17**: Linguagem de programação
-- **Gson 2.10.1**: Biblioteca para serialização/desserialização JSON
-- **Lombok 1.18.30**: Redução de boilerplate code (getters, setters, construtores)
-- **HttpClient**: Módulo nativo do Java 11+ para requisições HTTP
-- **ExchangeRate-API**: API principal para taxas de câmbio fiduciárias
-- **OpenExchangeRates**: API alternativa para taxas de câmbio fiduciárias (fallback)
-- **CoinGecko**: API para taxas de câmbio de criptomoedas
-- **java.util.logging**: Sistema de logs integrado do Java
-- **Scanner**: Interface de usuário via console para entrada de dados
+- [Visão Geral](#visão-geral)
+- [Arquitetura de Software](#arquitetura-de-software)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Módulos e Responsabilidades](#módulos-e-responsabilidades)
+- [Telas e Fluxo](#telas-e-fluxo)
+- [Regras de Negócio](#regras-de-negócio)
+- [Requisitos Funcionais](#requisitos-funcionais)
+- [Requisitos Não Funcionais](#requisitos-não-funcionais)
+- [Testes Automatizados](#testes-automatizados)
+- [CI/CD](#cicd)
+- [Contribuição](#contribuição)
 
-## 🔄 Fluxogramas
-```mermaid
-flowchart TD
-    A[Início da Aplicação] --> B[MenuPrincipal.main]
-    B --> C[Inicializa Dependências]
-    C --> C1[Historico, ApiConfig, ApiTaxaCambioService]
-    C1 --> C2[ConversorMoedas, InterfaceConversao, Estatisticas]
-    C2 --> D[Cria Instância de MenuPrincipal com DI]
-    D --> E[MenuPrincipal.executar]
-    E --> F{Loop Principal do Menu}
-    F --> G[ConsoleUtils.clearScreen]
-    G --> H[MenuPrincipal.exibirMenu]
-    H --> I[Usuário seleciona opção]
-    I --> J{Opção Selecionada}
+## Visão Geral
 
-    J -->|1: Converter Moeda| K[InterfaceConversao.realizarConversao]
-    J -->|2: Ver Histórico| L[InterfaceConversao.exibirHistorico]
-    J -->|3: Limpar Histórico| M[InterfaceConversao.limparHistorico]
-    J -->|4: Ver Taxas| N[MenuPrincipal.verTaxasDisponiveis]
-    J -->|5: Ver Estatísticas| O[Estatisticas.exibirEstatisticas]
-    J -->|6: Selecionar API| P[MenuPrincipal.selecionarApi]
-    J -->|7: Cripto para Moeda| Q[InterfaceConversao.realizarConversaoCripto]
-    J -->|8: Cripto para Criptomoeda| R[InterfaceConversao.realizarConversaoCriptoParaCripto]
-    J -->|9: Sair| S[Salva estado e encerra]
+O Conversor de Moedas é uma aplicação de console que permite converter valores entre diferentes moedas fiduciárias e criptomoedas. A aplicação consoma APIs externas para obter cotações em tempo real e realiza conversões precisas.
 
-    K --> K1[InterfaceConversao.realizarConversaoGenerica]
-    K1 --> K2[Exibe menus de seleção de moeda/cripto]
-    K2 --> K3[InterfaceConversao.selecionarMoeda/Cripto]
-    K3 --> K4[InterfaceConversao.solicitarValor]
-    K4 --> K5[ConversorMoedas.converter]
-    K5 --> K6[ApiTaxaCambioService.obterTaxaCambio]
-    K6 --> K7{Tenta API Primária}
-    K7 -->|Sucesso| K8[Retorna Taxa]
-    K7 -->|Falha| K9{Tenta API Fallback}
-    K9 -->|Sucesso| K8
-    K9 -->|Falha| K10[Lança Exceção]
-    K8 --> K11[Calcula Resultado]
-    K11 --> K12[HistoricoConversao.adicionarConversao]
-    K12 --> K13[LoggerUtil.log]
-    K13 --> K14[Exibe Resultado]
-    K14 --> K15{Deseja continuar?}
-    K15 -->|Sim| K1
-    K15 -->|Não| F
+### Características Principais
 
-    L --> L1[HistoricoConversao.getConversoes]
-    L1 --> L2[Exibe histórico formatado]
-    L2 --> L3{Exportar para TXT?}
-    L3 -->|Sim| L4[Exporta arquivo]
-    L3 -->|Não| F
-    L4 --> F
+- **Múltiplas Moedas**: 15 moedas fiduciárias e diversas criptomoedas
+- **APIs Externas**: Cotações em tempo real
+- **Gson**: Serialização e desserialização JSON
+- **Lombok**: Redução de boilerplate
+- **HttpClient Nativo**: Sem dependências externas para HTTP
 
-    M --> M1{Confirma limpeza?}
-    M1 -->|Sim| M2[HistoricoConversao.limparHistorico]
-    M1 -->|Não| F
-    M2 --> F
+### Moedas Suportadas
 
-    N --> N1[Exibe taxas disponíveis]
-    N1 --> F
+| Fiduciárias | Criptomoedas |
+|-------------|--------------|
+| BRL, USD, EUR | Bitcoin (BTC) |
+| GBP, JPY, CAD | Ethereum (ETH) |
+| AUD, CHF, CNY | Litecoin (LTC) |
+| INR, KRW, MXN | Ripple (XRP) |
+| SEK, NOK, DKK | Cardano (ADA) |
 
-    O --> O1[Calcula e exibe estatísticas]
-    O1 --> F
-
-    P --> P1[Atualiza API preferencial]
-    P1 --> P2[MenuPrincipal.inicializarServicos]
-    P2 --> F
-
-    Q --> Q1[Fluxo similar a K]
-    Q1 --> F
-
-    R --> R1[Fluxo similar a K]
-    R1 --> F
-
-    S --> Z[Fim da Aplicação]
-```
+### Fluxo do Sistema
 
 ```mermaid
 sequenceDiagram
     participant U as Usuário
-    participant M as MenuPrincipal
-    participant IC as InterfaceConversao
-    participant CM as ConversorMoedas
-    participant ATS as ApiTaxaCambioService
+    participant A as Aplicação
     participant API as API Externa
-    participant H as HistoricoConversao
-    participant L as Logger
-
-    U->>M: Iniciar Aplicação
-    M->>M: Inicializar Serviços
-    M->>U: Exibir Menu Principal
-    U->>M: Seleciona opção Converter (1)
-    M->>IC: realizarConversao(scanner, conversorMoedas)
-    IC->>IC: exibirMenuSelecaoMoeda()
-    IC->>U: Solicita moeda origem
-    U->>IC: Informa USD
-    IC->>IC: selecionarMoeda(scanner, "Selecione a moeda de origem: ")
-    IC->>IC: exibirMenuSelecaoMoeda()
-    IC->>U: Solicita moeda destino
-    U->>IC: Informa BRL
-    IC->>IC: selecionarMoeda(scanner, "Selecione a moeda de destino: ")
-    IC->>IC: solicitarValor(scanner)
-    IC->>U: Solicita valor
-    U->>IC: Informa 100.00
-    IC->>CM: converter(100, USD, BRL)
-    CM->>ATS: obterTaxaCambio(USD, BRL)
     
-    alt Taxa em Cache
-        ATS->>ATS: Buscar no cache
-        ATS->>CM: Retorna taxa cached
-    else Cache expirado/inexistente
-        ATS->>ATS: Tentar API Primária
-        ATS->>API: Requisição HTTP
-        API-->>ATS: Resposta JSON
-        ATS->>ATS: Parsear JSON
-        ATS->>ATS: Armazenar em cache
-        ATS->>CM: Retorna taxa
-    end
-    
-    CM->>CM: Calcular conversão
-    CM->>H: adicionarConversao(resultado)
-    CM->>L: Registrar log
-    CM-->>IC: Retorna resultado
-    IC->>U: Exibe: 100 USD = 495 BRL
-    IC->>U: Deseja fazer outra conversão? (s/n)
-    U->>IC: Informa 'n'
-    IC-->>M: Retorna
-    M->>U: Exibir Menu Principal
+    U->>A: Seleciona moedas
+    U->>A: Digita valor
+    A->>API: Consulta cotação
+    API-->>A: Retorna cotação
+    A->>A: Calcula conversão
+    A-->>U: Exibe resultado
 ```
+
+## Arquitetura de Software
+
+A aplicação segue uma arquitetura simples com camadas bem definidas:
+
+- **Model**: Entidades de dados (Moeda, Cotacao)
+- **Service**: Lógica de negócio e consumo de APIs
+- **Util**: Helpers e utilitários
+
+### Diagrama de Arquitetura
 
 ```mermaid
-classDiagram
-    class Main {
-        +main(String[] args)
-    }
+graph TB
+    subgraph "Frontend"
+        U[Usuário]
+        T[Terminal]
+    end
     
-    class MenuPrincipal {
-        -Scanner scanner
-        -ConversorMoedas conversorMoedas
-        -HistoricoConversao historicoConversao
-        -InterfaceConversao interfaceConversao
-        -Estatisticas estatisticas
-        -ApiProvider preferredApi
-        +MenuPrincipal(ConversorMoedas, HistoricoConversao, InterfaceConversao, Estatisticas)
-        +exibirMenu()
-        +executar()
-        -inicializarServicos()
-        -selecionarApi()
-        -realizarConversao()
-        -verHistorico()
-        -limparHistorico()
-        -verTaxasDisponiveis()
-        -verEstatisticas()
-        -realizarConversaoCripto()
-        -realizarConversaoCriptoParaCripto()
-    }
+    subgraph "Backend"
+        M[Model]
+        S[Service]
+        U2[Util]
+    end
     
-    class Moeda {
-        <<enumeration>>
-        +codigo: String
-        +nomeCompleto: String
-        +simbolo: String
-        +tipo: MoedaType
-        +isCrypto(): boolean
-        +isFiat(): boolean
-        +fromCodigo(String): Moeda
-    }
-
-    class MoedaType {
-        <<enumeration>>
-        FIAT
-        CRYPTO
-    }
+    subgraph "External"
+        API1[Exchange Rate API]
+        API2[Crypto API]
+    end
     
-    class TaxaCambio {
-        +origem: Moeda
-        +destino: Moeda
-        +taxa: double
-        +timestamp: LocalDateTime
-    }
-    
-    class ConversaoResultado {
-        +valorOriginal: double
-        +moedaOrigem: Moeda
-        +valorConvertido: double
-        +moedaDestino: Moeda
-        +taxaUtilizada: double
-        +dataHora: LocalDateTime
-    }
-    
-    class ConversorMoedas {
-        -ApiTaxaCambio apiTaxaCambio
-        -HistoricoConversao historicoConversao
-        +converter(double, Moeda, Moeda): ConversaoResultado
-    }
-    
-    class ApiTaxaCambio {
-        <<interface>>
-        +obterTaxaCambio(Moeda, Moeda) TaxaCambio
-    }
-
-    class ApiTaxaCambioService {
-        -ApiTaxaCambio primaryApi
-        -ApiTaxaCambio fallbackApi
-        -ApiTaxaCambio coinGeckoApi
-        -Map~String,TaxaCambio~ cacheTaxas
-        +ApiTaxaCambioService(ApiConfig, ApiProvider)
-        +obterTaxaCambio(Moeda, Moeda): TaxaCambio
-        -obterTaxaCambioCripto(Moeda, Moeda): TaxaCambio
-        -isCacheValid(TaxaCambio): boolean
-        +limparCacheExpirado()
-    }
-
-    class ApiProvider {
-        <<enumeration>>
-        EXCHANGERATE_API
-        OPENEXCHANGERATES
-        +getName(): String
-        +fromString(String): ApiProvider
-    }
-
-    class ApiTaxaCambioFactory {
-        +getApiImplementation(ApiProvider, ApiConfig): ApiTaxaCambio
-    }
-    
-    class ExchangeRateApiImpl {
-        -HttpClient client
-        -ApiConfig apiConfig
-        -JsonParser jsonParser
-        +ExchangeRateApiImpl(ApiConfig)
-        +obterTaxaCambio(Moeda, Moeda): TaxaCambio
-    }
-
-    class OpenExchangeRatesApiImpl {
-        -HttpClient client
-        -Gson gson
-        -String appId
-        +OpenExchangeRatesApiImpl(String)
-        +obterTaxaCambio(Moeda, Moeda): TaxaCambio
-        -parseOpenExchangeRatesResponse(String, Moeda, Moeda): double
-    }
-
-    class CoinGeckoApiImpl {
-        -HttpClient client
-        -Gson gson
-        -String apiKey
-        +CoinGeckoApiImpl(String)
-        +obterTaxaCambio(Moeda, Moeda): TaxaCambio
-        -parseCoinGeckoResponse(String, Moeda, Moeda): double
-    }
-    
-    class HistoricoConversao {
-        -Gson gson
-        -List~ConversaoResultado~ conversoes
-        +HistoricoConversao()
-        +adicionarConversao(ConversaoResultado)
-        +getUltimasConversoes(int): List~ConversaoResultado~
-        +limparHistorico()
-        +estaVazio(): boolean
-        +salvarEmArquivo()
-        -carregarDeArquivo()
-    }
-
-    class Estatisticas {
-        -HistoricoConversao historicoConversao
-        +Estatisticas(HistoricoConversao)
-        +exibirEstatisticas()
-        -getTotalConversoes(List~ConversaoResultado~): int
-        -getMoedaMaisConvertida(List~ConversaoResultado~): Moeda
-        -getValorTotalConvertidoPorMoeda(List~ConversaoResultado~): Map~Moeda,Double~
-        -getMediaValoresConvertidos(List~ConversaoResultado~): double
-        -gerarGraficoFrequenciaMoedas(List~ConversaoResultado~)
-    }
-    
-    class InterfaceConversao {
-        -Logger logger
-        +exibirMenuSelecaoMoeda()
-        +exibirMenuSelecaoCripto()
-        -selecionarMoedaGenerica(Scanner, String, Predicate~Moeda~): Moeda
-        +selecionarCripto(Scanner, String): Moeda
-        +selecionarMoeda(Scanner, String): Moeda
-        +solicitarValor(Scanner): double
-        -perguntarContinuarConversao(Scanner): boolean
-        -realizarConversaoGenerica(Scanner, ConversorMoedas, Runnable, Function~Scanner,Moeda~, Runnable, Function~Scanner,Moeda~)
-        +realizarConversao(Scanner, ConversorMoedas)
-        +realizarConversaoCripto(Scanner, ConversorMoedas)
-        +realizarConversaoCriptoParaCripto(Scanner, ConversorMoedas)
-        +exibirHistorico(Scanner, HistoricoConversao)
-        +limparHistorico(Scanner, HistoricoConversao)
-        -exportarHistoricoParaTxt(List~ConversaoResultado~)
-    }
-    
-    class ApiConfig {
-        -static ApiConfig instance
-        -apiKey: String
-        -openExchangeRatesAppId: String
-        -coinGeckoApiKey: String
-        -BASE_URL: String
-        -COINGECKO_BASE_URL: String
-        +getInstance(): ApiConfig
-        -loadApiKey()
-        +buildPairConversionUrl(String, String): String
-        +buildCoinGeckoSimplePriceUrl(String, String): String
-    }
-    
-    class JsonParser {
-        -Gson gson
-        +JsonParser(Gson)
-        +parseConversionRate(String, String, String): double
-    }
-    
-    class LoggerUtil {
-        +getLogger(String): Logger
-    }
-
-    class ConsoleUtils {
-        +clearScreen()
-        +waitForEnter(Scanner)
-        +solicitarDouble(Scanner, String, String, Predicate~Double~): double
-    }
-
-    Main --> MenuPrincipal
-    MenuPrincipal --> ConversorMoedas
-    MenuPrincipal --> HistoricoConversao
-    MenuPrincipal --> InterfaceConversao
-    MenuPrincipal --> Estatisticas
-    MenuPrincipal --> ApiProvider
-    MenuPrincipal --> ConsoleUtils
-    ConversorMoedas --> ApiTaxaCambio
-    ConversorMoedas --> HistoricoConversao
-    ApiTaxaCambioService ..|> ApiTaxaCambio
-    ApiTaxaCambioService --> ApiConfig
-    ApiTaxaCambioService --> ApiProvider
-    ApiTaxaCambioService --> ApiTaxaCambioFactory
-    ApiTaxaCambioFactory --> ApiTaxaCambio
-    ApiTaxaCambioFactory --> ApiConfig
-    ExchangeRateApiImpl ..|> ApiTaxaCambio
-    ExchangeRateApiImpl --> ApiConfig
-    ExchangeRateApiImpl --> JsonParser
-    OpenExchangeRatesApiImpl ..|> ApiTaxaCambio
-    CoinGeckoApiImpl ..|> ApiTaxaCambio
-    HistoricoConversao --> ConversaoResultado
-    HistoricoConversao --> LoggerUtil
-    Estatisticas --> HistoricoConversao
-    Estatisticas --> Moeda
-    InterfaceConversao --> ConversorMoedas
-    InterfaceConversao --> HistoricoConversao
-    InterfaceConversao --> Moeda
-    InterfaceConversao --> ConsoleUtils
-    InterfaceConversao --> LoggerUtil
-    JsonParser --> Gson
-    Moeda --> MoedaType
+    U --> T
+    T --> S
+    S --> M
+    S --> API1
+    S --> API2
+    S --> U2
 ```
 
-## 📦 Estrutura do Projeto
+## Estrutura de Pastas
+
 ```
-conversor-moedas/
+Conversor-de-Moedas/
 ├── src/
-│   └── main/
-│       └── java/
-│           └── com/
-│               └── conversor/
-│                   ├── Main.java
-│                   ├── MenuPrincipal.java
-│                   ├── InterfaceConversao.java
-│                   ├── Estatisticas.java
-│                   ├── models/
-│                   │   ├── Moeda.java
-│                   │   ├── TaxaCambio.java
-│                   │   ├── ConversaoResultado.java
-│                   │   └── HistoricoConversao.java
-│                   ├── services/
-│                   │   ├── ApiTaxaCambio.java
-│                   │   ├── ApiTaxaCambioService.java
-│                   │   ├── ApiTaxaCambioFactory.java
-│                   │   ├── ApiProvider.java
-│                   │   ├── ExchangeRateApiImpl.java
-│                   │   ├── OpenExchangeRatesApiImpl.java
-│                   │   ├── CoinGeckoApiImpl.java
-│                   │   └── ConversorMoedas.java
-│                   └── utils/
-│                       ├── ApiConfig.java
-│                       ├── ConsoleUtils.java
-│                       ├── JsonParser.java
-│                       └── LoggerUtil.java
-├── data/
-│   └── historico.json
-├── logs/
-│   └── conversoes.log
-├── docs/
-│   ├── capturas/
-│   └── fluxogramas/
-├── .gitignore
-├── README.md
-├── API_SETUP.md
-├── TESTES.md
-├── DOCUMENTACAO.md
-└── pom.xml
+│   ├── main/
+│   │   ├── java/com/conversor/
+│   │   │   ├── model/
+│   │   │   │   ├── Moeda.java
+│   │   │   │   └── Cotacao.java
+│   │   │   ├── service/
+│   │   │   │   ├── ConversorService.java
+│   │   │   │   └── ApiClient.java
+│   │   │   ├── util/
+│   │   │   │   └── JsonUtil.java
+│   │   │   └── ConversorApp.java
+│   │   └── resources/
+│   └── test/
+│       └── java/com/conversor/
+│           └── ConversorServiceTest.java
+├── pom.xml
+└── README.md
 ```
 
-## 🚀 Como Executar
+## Módulos e Responsabilidades
 
-### Pré-requisitos
-- Java JDK 17 ou superior instalado
-- Apache Maven instalado
-- Conexão com internet
-- Chaves das APIs ExchangeRate-API, OpenExchangeRates e CoinGecko (gratuitas)
+| Módulo | Responsabilidade | Tecnologia |
+|--------|------------------|------------|
+| Model | Entidades de dados | Java, Lombok |
+| Service | Lógica de negócio | Java, HttpClient |
+| Util | Helpers | Gson |
 
-### Configuração
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/dessima/conversor-moedas.git
-   cd conversor-moedas
-   ```
-2. Obtenha suas chaves das APIs:
-   - **ExchangeRate-API**: Registre-se em [https://www.exchangerate-api.com/](https://www.exchangerate-api.com/) e obtenha sua chave gratuita.
-   - **OpenExchangeRates**: Registre-se em [https://openexchangerates.org/](https://openexchangerates.org/) e obtenha seu App ID gratuito.
-   - **CoinGecko**: Registre-se em [https://www.coingecko.com/api](https://www.coingecko.com/api) e obtenha sua chave gratuita (se necessário, para acesso a dados mais abrangentes).
-3. Configure as variáveis de ambiente com suas chaves:
-   - `EXCHANGERATE_API_KEY=SUA_CHAVE_EXCHANGERATE`
-   - `OPENEXCHANGERATES_APP_ID=SEU_APP_ID_OPENEXCHANGERATES`
-   - `COINGECKO_API_KEY=SUA_CHAVE_COINGECKO`
-   (No Windows, você pode definir variáveis de ambiente temporariamente no terminal com `set VAR=VALOR` ou permanentemente nas configurações do sistema. No Linux/macOS, use `export VAR=VALOR` ou adicione ao seu `.bashrc`/`.zshrc`).
+### Entidades do Sistema
 
-### Compilação e Execução
-1. Compile o projeto usando Maven:
-   ```bash
-   mvn clean install
-   ```
-2. Execute a aplicação:
-   ```bash
-   java -jar target/conversor-moedas-1.0-SNAPSHOT.jar
-   ```
-   (Certifique-se de que o nome do JAR corresponde ao gerado pelo Maven, que pode variar ligeiramente.)
+| Entidade | Atributos | Descrição |
+|----------|-----------|-----------|
+| Moeda | codigo, nome, tipo | Representa uma moeda |
+| Cotacao | moedaOrigem, moedaDestino, valor | Cotação atual |
 
-## 👨‍💻 Autor
+## Telas e Fluxo
 
-<p>
-    <a href="https://www.linkedin.com/in/dessim">
-        <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
-    </a>
-    <a href="https://github.com/dessima">
-        <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-    </a>
-</p>
+### Menu Principal
 
-<p>
-    Feito com ❤️ por <strong>José Anderson</strong>
-</p>
+```
+================================
+    Conversor de Moedas
+================================
+1 - Converter moeda fiduciária
+2 - Converter criptomoeda
+3 - Ver cotação atual
+4 - Listar moedas disponíveis
+0 - Sair
+================================
+```
 
----
+### Fluxo de Conversão
 
-## 📄 Licença
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+```mermaid
+flowchart TD
+    A[Início] --> B[Exibir menu]
+    B --> C[Ler opção]
+    C --> D{Opção válida?}
+    D -->|Não| E[Exibir erro]
+    E --> B
+    D -->|Sim| F[Selecionar moeda origem]
+    F --> G[Selecionar moeda destino]
+    G --> H[Digitar valor]
+    H --> I[Consultar API]
+    I --> J[Calcular conversão]
+    J --> K[Exibir resultado]
+    K --> B
+```
+
+## Regras de Negócio
+
+1. **Taxas de Câmbio**: Atualizadas em tempo real via API
+2. **Precisão**: 4 casas decimais para moedas fiduciárias
+3. **Criptomoedas**: 8 casas decimais
+4. **Valor Mínimo**: R$ 0,01 para conversão
+5. **Cache**: Cotações cacheadas por 5 minutos
+
+## Requisitos Funcionais
+
+| ID | Requisito | Prioridade |
+|----|-----------|------------|
+| RF-01 | Converter moedas fiduciárias | Alta |
+| RF-02 | Converter criptomoedas | Alta |
+| RF-03 | Consultar cotação atual | Média |
+| RF-04 | Listar moedas disponíveis | Média |
+| RF-05 | Validar entrada | Alta |
+
+## Requisitos Não Funcionais
+
+| ID | Requisito | Descrição |
+|----|-----------|-----------|
+| RNF-01 | Performance | Resposta em menos de 2s |
+| RNF-02 | Disponibilidade | Tratamento de falhas de API |
+| RNF-03 | Usabilidade | Interface clara e intuitiva |
+| RNF-04 | Manutenabilidade | Código limpo e documentado |
+
+## Testes Automatizados
+
+### Tipos de Teste
+
+| Tipo | Cobertura | Ferramenta |
+|------|-----------|------------|
+| Unitários | 85% | JUnit 5 |
+
+### Comandos de Teste
+
+```bash
+# Executar todos os testes
+mvn test
+
+# Com cobertura
+mvn jacoco:report
+```
+
+## CI/CD
+
+| Workflow | Dispara em | O que faz |
+|----------|------------|-----------|
+| `test.yml` | Push/PR | Executa testes |
+| `build.yml` | Merge | Build do JAR |
+
+## Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+### Diretrizes de Contribuição
+
+- Siga o padrão de código Java
+- Escreva testes para novas funcionalidades
+- Atualize a documentação quando necessário
+
+## Autor
+
+**José Anderson** ([@DessimA](https://github.com/DessimA))
+[LinkedIn](https://www.linkedin.com/in/dessim/) | [Website](https://jasc-dessima-dev.vercel.app/)
